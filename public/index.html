@@ -1,0 +1,1123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Google Maps Business Scraper</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
+      min-height: 100vh;
+      color: #333;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    header {
+      text-align: center;
+      padding: 30px 0;
+    }
+
+    header h1 {
+      font-size: 2.5rem;
+      color: #1a73e8;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    header p {
+      color: #5f6368;
+      font-size: 1.1rem;
+    }
+
+    .main-content {
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      gap: 24px;
+    }
+
+    @media (max-width: 1024px) {
+      .main-content {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      padding: 24px;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid #f0f0f0;
+    }
+
+    .card-header h2 {
+      font-size: 1.3rem;
+      color: #202124;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    .form-group label {
+      display: block;
+      font-weight: 600;
+      color: #5f6368;
+      margin-bottom: 8px;
+      font-size: 0.9rem;
+    }
+
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid #e8eaed;
+      border-radius: 10px;
+      font-size: 1rem;
+      transition: all 0.2s ease;
+      background: #fafafa;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: #1a73e8;
+      background: #fff;
+      box-shadow: 0 0 0 4px rgba(26, 115, 232, 0.1);
+    }
+
+    .form-group input::placeholder {
+      color: #9aa0a6;
+    }
+
+    .radio-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .radio-option {
+      display: flex;
+      align-items: center;
+      padding: 12px 16px;
+      border: 2px solid #e8eaed;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .radio-option:hover {
+      border-color: #1a73e8;
+      background: #f8fbff;
+    }
+
+    .radio-option.selected {
+      border-color: #1a73e8;
+      background: #e8f0fe;
+    }
+
+    .radio-option input {
+      margin-right: 12px;
+      accent-color: #1a73e8;
+      width: 18px;
+      height: 18px;
+    }
+
+    .radio-option span {
+      font-weight: 500;
+      color: #333;
+    }
+
+    .conditional-fields {
+      display: none;
+      margin-top: 15px;
+      padding: 15px;
+      background: #f8f9fa;
+      border-radius: 10px;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .conditional-fields.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .btn {
+      width: 100%;
+      padding: 14px 24px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #1a73e8, #1557b0);
+      color: #fff;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: linear-gradient(135deg, #1557b0, #0d47a1);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(26, 115, 232, 0.4);
+    }
+
+    .btn-primary:disabled {
+      background: #a8c7fa;
+      cursor: not-allowed;
+    }
+
+    .btn-secondary {
+      background: #f1f3f4;
+      color: #5f6368;
+    }
+
+    .btn-secondary:hover {
+      background: #e8eaed;
+    }
+
+    .btn-success {
+      background: linear-gradient(135deg, #34a853, #1e8e3e);
+      color: #fff;
+    }
+
+    .btn-success:hover {
+      background: linear-gradient(135deg, #1e8e3e, #137333);
+    }
+
+    .logs-container {
+      display: flex;
+      flex-direction: column;
+      height: 400px;
+    }
+
+    .logs-box {
+      flex: 1;
+      background: #1e1e1e;
+      border-radius: 10px;
+      padding: 16px;
+      font-family: 'Consolas', 'Monaco', monospace;
+      font-size: 0.85rem;
+      overflow-y: auto;
+      color: #d4d4d4;
+    }
+
+    .log-entry {
+      padding: 4px 0;
+      border-bottom: 1px solid #333;
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+    }
+
+    .log-time {
+      color: #858585;
+      flex-shrink: 0;
+      font-size: 0.8rem;
+    }
+
+    .log-level {
+      flex-shrink: 0;
+      font-weight: 600;
+      font-size: 0.8rem;
+    }
+
+    .log-entry.log .log-level { color: #9cdcfe; }
+    .log-entry.info .log-level { color: #569cd6; }
+    .log-entry.success .log-level { color: #4ec9b0; }
+    .log-entry.error .log-level { color: #f14c4c; }
+    .log-entry.progress .log-level { color: #dcdcaa; }
+
+    .log-message {
+      word-break: break-word;
+      color: #d4d4d4;
+    }
+
+    .log-entry.info .log-message { color: #9cdcfe; }
+    .log-entry.success .log-message { color: #4ec9b0; }
+    .log-entry.error .log-message { color: #f14c4c; }
+    .log-entry.progress .log-message { color: #dcdcaa; }
+
+    .progress-bar {
+      margin-top: 16px;
+      background: #e8eaed;
+      border-radius: 8px;
+      height: 8px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #1a73e8, #34a853);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    .progress-text {
+      text-align: center;
+      margin-top: 8px;
+      font-size: 0.9rem;
+      color: #5f6368;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .status-idle { background: #e8eaed; color: #5f6368; }
+    .status-running { background: #e8f0fe; color: #1a73e8; }
+    .status-completed { background: #e6f4ea; color: #137333; }
+    .status-error { background: #fce8e6; color: #c5221f; }
+
+    .results-section {
+      margin-top: 24px;
+    }
+
+    .results-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .export-buttons {
+      display: flex;
+      gap: 10px;
+    }
+
+    .export-buttons .btn {
+      width: auto;
+      padding: 10px 20px;
+      font-size: 0.9rem;
+    }
+
+    .results-table-container {
+      overflow-x: auto;
+      border-radius: 10px;
+      border: 1px solid #e8eaed;
+    }
+
+    .results-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+
+    .results-table th,
+    .results-table td {
+      padding: 12px 16px;
+      text-align: left;
+      border-bottom: 1px solid #e8eaed;
+    }
+
+    .results-table th {
+      background: #f8f9fa;
+      font-weight: 600;
+      color: #5f6368;
+      position: sticky;
+      top: 0;
+      white-space: nowrap;
+    }
+
+    .results-table tr:hover {
+      background: #f8fbff;
+    }
+
+    .results-table td {
+      max-width: 200px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .results-table a {
+      color: #1a73e8;
+      text-decoration: none;
+    }
+
+    .results-table a:hover {
+      text-decoration: underline;
+    }
+
+    .rating-stars {
+      color: #fbbc04;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #5f6368;
+    }
+
+    .empty-state svg {
+      width: 80px;
+      height: 80px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+
+    .spinner {
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: #fff;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .pulse {
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+      border-bottom: 2px solid #e8eaed;
+      padding-bottom: 0;
+    }
+
+    .tab {
+      padding: 12px 20px;
+      border: none;
+      background: none;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #5f6368;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -2px;
+      transition: all 0.2s ease;
+    }
+
+    .tab:hover {
+      color: #1a73e8;
+    }
+
+    .tab.active {
+      color: #1a73e8;
+      border-bottom-color: #1a73e8;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .stat-card {
+      background: linear-gradient(135deg, #f8f9fa, #e8eaed);
+      padding: 16px;
+      border-radius: 12px;
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #1a73e8;
+    }
+
+    .stat-label {
+      font-size: 0.85rem;
+      color: #5f6368;
+      margin-top: 4px;
+    }
+
+    .detail-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .detail-modal.active {
+      display: flex;
+    }
+
+    .detail-modal-content {
+      background: #fff;
+      border-radius: 16px;
+      max-width: 800px;
+      width: 90%;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 24px;
+    }
+
+    .detail-modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .detail-modal-close {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #5f6368;
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    .detail-item {
+      padding: 12px;
+      background: #f8f9fa;
+      border-radius: 8px;
+    }
+
+    .detail-item.full-width {
+      grid-column: span 2;
+    }
+
+    .detail-label {
+      font-size: 0.8rem;
+      color: #5f6368;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+
+    .detail-value {
+      font-size: 1rem;
+      color: #202124;
+      word-break: break-word;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#1a73e8" stroke-width="2">
+          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+          <circle cx="12" cy="10" r="3"/>
+        </svg>
+        Google Maps Business Scraper
+      </h1>
+      <p>Extract comprehensive business data from Google Maps</p>
+    </header>
+
+    <div class="main-content">
+      <!-- Left Panel - Search Form -->
+      <div class="card">
+        <div class="card-header">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1a73e8" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/>
+            <path d="M21 21l-4.35-4.35"/>
+          </svg>
+          <h2>Search Configuration</h2>
+        </div>
+
+        <form id="searchForm">
+          <div class="form-group">
+            <label>Business Type / Query</label>
+            <input type="text" id="query" placeholder="e.g., restaurants, dentists, hotels" required>
+          </div>
+
+          <div class="form-group">
+            <label>Search Type</label>
+            <div class="radio-group">
+              <label class="radio-option selected">
+                <input type="radio" name="searchType" value="location" checked>
+                <span>Search by Location</span>
+              </label>
+              <label class="radio-option">
+                <input type="radio" name="searchType" value="zipcode">
+                <span>Search by ZIP Code</span>
+              </label>
+              <label class="radio-option">
+                <input type="radio" name="searchType" value="radius">
+                <span>Search by Coordinates</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Location Fields -->
+          <div class="conditional-fields active" id="locationFields">
+            <div class="form-group">
+              <label>Location</label>
+              <input type="text" id="location" placeholder="e.g., New York, NY or Miami, FL">
+            </div>
+          </div>
+
+          <!-- ZIP Code Fields -->
+          <div class="conditional-fields" id="zipcodeFields">
+            <div class="form-group">
+              <label>ZIP Code</label>
+              <input type="text" id="zipCode" placeholder="e.g., 10001">
+            </div>
+          </div>
+
+          <!-- Radius Fields -->
+          <div class="conditional-fields" id="radiusFields">
+            <div class="form-group">
+              <label>Latitude</label>
+              <input type="number" id="latitude" step="any" placeholder="e.g., 40.7128">
+            </div>
+            <div class="form-group">
+              <label>Longitude</label>
+              <input type="number" id="longitude" step="any" placeholder="e.g., -74.0060">
+            </div>
+            <div class="form-group">
+              <label>Radius (meters)</label>
+              <input type="number" id="radiusMeters" value="1000" placeholder="e.g., 1000">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Maximum Results</label>
+            <input type="number" id="maxResults" value="20" min="1" max="200" placeholder="20">
+          </div>
+
+          <button type="submit" class="btn btn-primary" id="startBtn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="5 3 19 12 5 21 5 3"/>
+            </svg>
+            Start Scraping
+          </button>
+        </form>
+      </div>
+
+      <!-- Right Panel - Results & Logs -->
+      <div>
+        <div class="card">
+          <div class="card-header">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1a73e8" stroke-width="2">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+              <line x1="3" y1="9" x2="21" y2="9"/>
+              <line x1="9" y1="21" x2="9" y2="9"/>
+            </svg>
+            <h2>Progress & Results</h2>
+            <span class="status-badge status-idle" id="statusBadge">Idle</span>
+          </div>
+
+          <div class="tabs">
+            <button class="tab active" data-tab="logs">Logs</button>
+            <button class="tab" data-tab="results">Results</button>
+          </div>
+
+          <!-- Logs Tab -->
+          <div class="tab-content active" id="logsTab">
+            <div class="logs-container">
+              <div class="logs-box" id="logsBox">
+                <div class="log-entry">
+                  <span class="log-message">Ready to start scraping...</span>
+                </div>
+              </div>
+            </div>
+            <div class="progress-bar" id="progressBar" style="display: none;">
+              <div class="progress-bar-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text" id="progressText" style="display: none;">Processing...</div>
+          </div>
+
+          <!-- Results Tab -->
+          <div class="tab-content" id="resultsTab">
+            <div class="stats-grid" id="statsGrid" style="display: none;">
+              <div class="stat-card">
+                <div class="stat-value" id="totalCount">0</div>
+                <div class="stat-label">Businesses Found</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-value" id="avgRating">-</div>
+                <div class="stat-label">Avg. Rating</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-value" id="withPhone">0</div>
+                <div class="stat-label">With Phone</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-value" id="withWebsite">0</div>
+                <div class="stat-label">With Website</div>
+              </div>
+            </div>
+
+            <div class="results-header" id="resultsHeader" style="display: none;">
+              <h3>Scraped Data</h3>
+              <div class="export-buttons">
+                <button class="btn btn-secondary" id="exportCSV">
+                  📄 Export CSV
+                </button>
+                <button class="btn btn-success" id="exportJSON">
+                  📦 Export JSON
+                </button>
+              </div>
+            </div>
+
+            <div class="results-table-container" style="max-height: 500px; overflow-y: auto;">
+              <table class="results-table" id="resultsTable">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Business Name</th>
+                    <th>Phone</th>
+                    <th>Address</th>
+                    <th>Website</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="resultsBody">
+                  <tr>
+                    <td colspan="8">
+                      <div class="empty-state">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                          <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                        <p>No results yet. Configure your search and click "Start Scraping"</p>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Detail Modal -->
+  <div class="detail-modal" id="detailModal">
+    <div class="detail-modal-content">
+      <div class="detail-modal-header">
+        <h2 id="modalBusinessName">Business Details</h2>
+        <button class="detail-modal-close" id="closeModal">&times;</button>
+      </div>
+      <div class="detail-grid" id="modalContent">
+        <!-- Populated dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentSessionId = null;
+    let results = [];
+    let eventSource = null;
+
+    // DOM Elements
+    const searchForm = document.getElementById('searchForm');
+    const startBtn = document.getElementById('startBtn');
+    const logsBox = document.getElementById('logsBox');
+    const statusBadge = document.getElementById('statusBadge');
+    const progressBar = document.getElementById('progressBar');
+    const progressFill = document.getElementById('progressFill');
+    const progressText = document.getElementById('progressText');
+    const resultsBody = document.getElementById('resultsBody');
+    const detailModal = document.getElementById('detailModal');
+
+    // Tab switching
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById(tab.dataset.tab + 'Tab').classList.add('active');
+      });
+    });
+
+    // Radio button handling
+    document.querySelectorAll('input[name="searchType"]').forEach(radio => {
+      radio.addEventListener('change', (e) => {
+        document.querySelectorAll('.radio-option').forEach(opt => opt.classList.remove('selected'));
+        e.target.closest('.radio-option').classList.add('selected');
+        
+        document.querySelectorAll('.conditional-fields').forEach(f => f.classList.remove('active'));
+        document.getElementById(e.target.value + 'Fields').classList.add('active');
+      });
+    });
+
+    // Modal handling
+    document.getElementById('closeModal').addEventListener('click', () => {
+      detailModal.classList.remove('active');
+    });
+
+    detailModal.addEventListener('click', (e) => {
+      if (e.target === detailModal) {
+        detailModal.classList.remove('active');
+      }
+    });
+
+    // Form submission
+    searchForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const searchType = document.querySelector('input[name="searchType"]:checked').value;
+      const formData = {
+        searchType,
+        query: document.getElementById('query').value,
+        maxResults: parseInt(document.getElementById('maxResults').value) || 20,
+      };
+
+      if (searchType === 'location') {
+        formData.location = document.getElementById('location').value;
+        if (!formData.location) {
+          alert('Please enter a location');
+          return;
+        }
+      } else if (searchType === 'zipcode') {
+        formData.zipCode = document.getElementById('zipCode').value;
+        if (!formData.zipCode) {
+          alert('Please enter a ZIP code');
+          return;
+        }
+      } else if (searchType === 'radius') {
+        formData.latitude = document.getElementById('latitude').value;
+        formData.longitude = document.getElementById('longitude').value;
+        formData.radiusMeters = document.getElementById('radiusMeters').value;
+        if (!formData.latitude || !formData.longitude) {
+          alert('Please enter latitude and longitude');
+          return;
+        }
+      }
+
+      startScraping(formData);
+    });
+
+    async function startScraping(formData) {
+      // Reset UI
+      logsBox.innerHTML = '';
+      results = [];
+      updateStatus('running');
+      startBtn.disabled = true;
+      startBtn.innerHTML = '<div class="spinner"></div> Scraping...';
+      progressBar.style.display = 'block';
+      progressText.style.display = 'block';
+      progressFill.style.width = '0%';
+      progressText.textContent = 'Initializing...';
+
+      try {
+        const response = await fetch('/api/scrape', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData),
+        });
+
+        const data = await response.json();
+        currentSessionId = data.sessionId;
+
+        // Connect to SSE for real-time logs
+        if (eventSource) {
+          eventSource.close();
+        }
+
+        eventSource = new EventSource(`/api/logs/${currentSessionId}`);
+
+        eventSource.onmessage = (event) => {
+          const logData = JSON.parse(event.data);
+          
+          if (logData.type === 'complete') {
+            handleComplete(logData.count);
+          } else if (logData.type === 'error') {
+            handleError(logData.message);
+          } else if (logData.type === 'progress') {
+            const progress = JSON.parse(logData.message);
+            updateProgress(progress.current, progress.total, progress.name);
+          } else {
+            addLog(logData);
+          }
+        };
+
+        eventSource.onerror = () => {
+          // Check if scraping completed
+          fetchResults();
+        };
+
+      } catch (error) {
+        handleError(error.message);
+      }
+    }
+
+    function addLog(logData) {
+      const entry = document.createElement('div');
+      entry.className = `log-entry ${logData.type}`;
+      
+      const time = new Date(logData.timestamp).toLocaleTimeString('en-US', { 
+        hour12: false, 
+        hour: '2-digit', 
+        minute: '2-digit', 
+        second: '2-digit' 
+      });
+      const levelTag = logData.type.toUpperCase().padEnd(7);
+      entry.innerHTML = `
+        <span class="log-time">${time}</span>
+        <span class="log-level">[${levelTag}]</span>
+        <span class="log-message">${escapeHtml(logData.message)}</span>
+      `;
+      
+      logsBox.appendChild(entry);
+      logsBox.scrollTop = logsBox.scrollHeight;
+    }
+
+    function updateProgress(current, total, name) {
+      const percent = Math.round((current / total) * 100);
+      progressFill.style.width = `${percent}%`;
+      progressText.textContent = `Processing ${current}/${total}: ${name || '...'}`;
+    }
+
+    function updateStatus(status) {
+      statusBadge.className = `status-badge status-${status}`;
+      const statusTexts = {
+        idle: 'Idle',
+        running: 'Running',
+        completed: 'Completed',
+        error: 'Error',
+      };
+      statusBadge.textContent = statusTexts[status] || status;
+    }
+
+    async function handleComplete(count) {
+      updateStatus('completed');
+      progressFill.style.width = '100%';
+      progressText.textContent = `Completed! Found ${count} businesses.`;
+      
+      startBtn.disabled = false;
+      startBtn.innerHTML = `
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="5 3 19 12 5 21 5 3"/>
+        </svg>
+        Start Scraping
+      `;
+
+      await fetchResults();
+
+      // Switch to results tab
+      document.querySelector('.tab[data-tab="results"]').click();
+    }
+
+    function handleError(message) {
+      updateStatus('error');
+      addLog({ type: 'error', message, timestamp: new Date().toISOString() });
+      
+      startBtn.disabled = false;
+      startBtn.innerHTML = `
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="5 3 19 12 5 21 5 3"/>
+        </svg>
+        Start Scraping
+      `;
+    }
+
+    async function fetchResults() {
+      if (!currentSessionId) return;
+
+      try {
+        const response = await fetch(`/api/results/${currentSessionId}`);
+        const data = await response.json();
+        
+        if (data.status === 'completed' && data.results.length > 0) {
+          results = data.results;
+          renderResults();
+        }
+      } catch (error) {
+        console.error('Error fetching results:', error);
+      }
+    }
+
+    function renderResults() {
+      if (results.length === 0) {
+        resultsBody.innerHTML = `
+          <tr>
+            <td colspan="8">
+              <div class="empty-state">
+                <p>No results found</p>
+              </div>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      // Show stats
+      document.getElementById('statsGrid').style.display = 'grid';
+      document.getElementById('resultsHeader').style.display = 'flex';
+
+      // Calculate stats
+      const totalCount = results.length;
+      const withPhone = results.filter(r => r.phone).length;
+      const withWebsite = results.filter(r => r.website).length;
+      const ratings = results.filter(r => r.rating).map(r => r.rating);
+      const avgRating = ratings.length > 0 
+        ? (ratings.reduce((a, b) => a + b, 0) / ratings.length).toFixed(1)
+        : '-';
+
+      document.getElementById('totalCount').textContent = totalCount;
+      document.getElementById('avgRating').textContent = avgRating;
+      document.getElementById('withPhone').textContent = withPhone;
+      document.getElementById('withWebsite').textContent = withWebsite;
+
+      // Render table
+      resultsBody.innerHTML = results.map((item, index) => `
+        <tr>
+          <td>${index + 1}</td>
+          <td><strong>${escapeHtml(item.name || 'N/A')}</strong></td>
+          <td>${escapeHtml(item.phone || '-')}</td>
+          <td title="${escapeHtml(item.address?.full || '')}">${escapeHtml(truncate(item.address?.full || '-', 30))}</td>
+          <td>
+            ${item.website 
+              ? `<a href="${item.website}" target="_blank">Visit →</a>`
+              : '-'}
+          </td>
+          <td>
+            <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.8rem;" onclick="showDetail(${index})">
+              View
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function showDetail(index) {
+      const item = results[index];
+      if (!item) return;
+
+      document.getElementById('modalBusinessName').textContent = item.name || 'Business Details';
+      
+      const fields = [
+        { label: 'Business Name', value: item.name },
+        { label: 'Type', value: item.type },
+        { label: 'Phone', value: item.phone },
+        { label: 'WhatsApp', value: item.whatsapp },
+        { label: 'Email', value: item.email },
+        { label: 'Website', value: item.website, isLink: true },
+        { label: 'Full Address', value: item.address?.full, fullWidth: true },
+        { label: 'Street', value: item.address?.street },
+        { label: 'City', value: item.address?.city },
+        { label: 'State', value: item.address?.state },
+        { label: 'ZIP Code', value: item.address?.zipCode },
+        { label: 'Country', value: item.address?.country },
+        { label: 'Latitude', value: item.coordinates?.latitude },
+        { label: 'Longitude', value: item.coordinates?.longitude },
+        { label: 'Rating', value: item.rating ? `${item.rating} ★` : null },
+        { label: 'Reviews Count', value: item.reviewsCount },
+        { label: 'Price Level', value: item.priceLevel },
+        { label: 'Plus Code', value: item.plusCode },
+        { label: 'Place ID', value: item.placeId },
+        { label: 'Description', value: item.description, fullWidth: true },
+        { label: 'Opening Hours', value: item.openingHours?.map(h => `${h.day}: ${h.hours}`).join('\n'), fullWidth: true },
+        { label: 'Amenities', value: item.amenities?.join(', '), fullWidth: true },
+        { label: 'Google Maps URL', value: item.googleMapsUrl, isLink: true, fullWidth: true },
+        { label: 'Image URL', value: item.imageUrl, isLink: true },
+        { label: 'Distance from Center', value: item.distanceFromCenter ? `${item.distanceFromCenter}m` : null },
+        { label: 'Scraped At', value: item.scrapedAt },
+      ];
+
+      const content = fields
+        .filter(f => f.value)
+        .map(f => `
+          <div class="detail-item ${f.fullWidth ? 'full-width' : ''}">
+            <div class="detail-label">${f.label}</div>
+            <div class="detail-value">
+              ${f.isLink 
+                ? `<a href="${escapeHtml(f.value)}" target="_blank">${escapeHtml(truncate(f.value, 50))}</a>`
+                : escapeHtml(String(f.value)).replace(/\n/g, '<br>')}
+            </div>
+          </div>
+        `).join('');
+
+      document.getElementById('modalContent').innerHTML = content;
+      detailModal.classList.add('active');
+    }
+
+    // Export handlers
+    document.getElementById('exportCSV').addEventListener('click', () => {
+      if (currentSessionId) {
+        window.location.href = `/api/export/${currentSessionId}/csv`;
+      }
+    });
+
+    document.getElementById('exportJSON').addEventListener('click', () => {
+      if (currentSessionId) {
+        window.location.href = `/api/export/${currentSessionId}/json`;
+      }
+    });
+
+    // Utility functions
+    function stripAnsiCodes(text) {
+      if (!text) return '';
+      // Remove ANSI escape codes
+      return String(text).replace(/\u001b\[\d+m/g, '').replace(/\[(\d+m|\d+;\d+m|\d+;\d+;\d+m)\]/g, '');
+    }
+
+    function escapeHtml(text) {
+      if (!text) return '';
+      const div = document.createElement('div');
+      div.textContent = stripAnsiCodes(text);
+      return div.innerHTML;
+    }
+
+    function truncate(text, maxLength) {
+      if (!text) return '';
+      return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+    }
+  </script>
+</body>
+</html>
