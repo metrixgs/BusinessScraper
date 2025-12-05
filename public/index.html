@@ -1,0 +1,1855 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Google Maps Business Scraper</title>
+  <!-- Leaflet CSS for interactive map -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
+      min-height: 100vh;
+      color: #333;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    header {
+      text-align: center;
+      padding: 30px 0;
+    }
+
+    header h1 {
+      font-size: 2.5rem;
+      color: #1a73e8;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    header p {
+      color: #5f6368;
+      font-size: 1.1rem;
+    }
+
+    .main-content {
+      display: grid;
+      grid-template-columns: 420px 1fr;
+      gap: 24px;
+    }
+
+    @media (max-width: 1024px) {
+      .main-content {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      padding: 24px;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid #f0f0f0;
+    }
+
+    .card-header h2 {
+      font-size: 1.3rem;
+      color: #202124;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    .form-group label {
+      display: block;
+      font-weight: 600;
+      color: #5f6368;
+      margin-bottom: 8px;
+      font-size: 0.9rem;
+    }
+
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid #e8eaed;
+      border-radius: 10px;
+      font-size: 1rem;
+      transition: all 0.2s ease;
+      background: #fafafa;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: #1a73e8;
+      background: #fff;
+      box-shadow: 0 0 0 4px rgba(26, 115, 232, 0.1);
+    }
+
+    .form-group input::placeholder {
+      color: #9aa0a6;
+    }
+
+    .radio-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .radio-option {
+      display: flex;
+      align-items: center;
+      padding: 12px 16px;
+      border: 2px solid #e8eaed;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .radio-option:hover {
+      border-color: #1a73e8;
+      background: #f8fbff;
+    }
+
+    .radio-option.selected {
+      border-color: #1a73e8;
+      background: #e8f0fe;
+    }
+
+    .radio-option input {
+      margin-right: 12px;
+      accent-color: #1a73e8;
+      width: 18px;
+      height: 18px;
+    }
+
+    .radio-option span {
+      font-weight: 500;
+      color: #333;
+    }
+
+    .conditional-fields {
+      display: none;
+      margin-top: 15px;
+      padding: 15px;
+      background: #f8f9fa;
+      border-radius: 10px;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .conditional-fields.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .btn {
+      width: 100%;
+      padding: 14px 24px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #1a73e8, #1557b0);
+      color: #fff;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: linear-gradient(135deg, #1557b0, #0d47a1);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(26, 115, 232, 0.4);
+    }
+
+    .btn-primary:disabled {
+      background: #a8c7fa;
+      cursor: not-allowed;
+    }
+
+    .btn-secondary {
+      background: #f1f3f4;
+      color: #5f6368;
+    }
+
+    .btn-secondary:hover {
+      background: #e8eaed;
+    }
+
+    .btn-success {
+      background: linear-gradient(135deg, #34a853, #1e8e3e);
+      color: #fff;
+    }
+
+    .btn-success:hover {
+      background: linear-gradient(135deg, #1e8e3e, #137333);
+    }
+
+    .btn-small {
+      width: auto;
+      padding: 8px 16px;
+      font-size: 0.9rem;
+    }
+
+    .logs-container {
+      display: flex;
+      flex-direction: column;
+      height: 400px;
+    }
+
+    .logs-box {
+      flex: 1;
+      background: #1e1e1e;
+      border-radius: 10px;
+      padding: 16px;
+      font-family: 'Consolas', 'Monaco', monospace;
+      font-size: 0.85rem;
+      overflow-y: auto;
+      color: #d4d4d4;
+    }
+
+    .log-entry {
+      padding: 4px 0;
+      border-bottom: 1px solid #333;
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+    }
+
+    .log-time {
+      color: #858585;
+      flex-shrink: 0;
+      font-size: 0.8rem;
+    }
+
+    .log-level {
+      flex-shrink: 0;
+      font-weight: 600;
+      font-size: 0.8rem;
+    }
+
+    .log-entry.log .log-level { color: #9cdcfe; }
+    .log-entry.info .log-level { color: #569cd6; }
+    .log-entry.success .log-level { color: #4ec9b0; }
+    .log-entry.error .log-level { color: #f14c4c; }
+    .log-entry.progress .log-level { color: #dcdcaa; }
+
+    .log-message {
+      word-break: break-word;
+      color: #d4d4d4;
+    }
+
+    .log-entry.info .log-message { color: #9cdcfe; }
+    .log-entry.success .log-message { color: #4ec9b0; }
+    .log-entry.error .log-message { color: #f14c4c; }
+    .log-entry.progress .log-message { color: #dcdcaa; }
+
+    .progress-bar {
+      margin-top: 16px;
+      background: #e8eaed;
+      border-radius: 8px;
+      height: 8px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #1a73e8, #34a853);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    .progress-text {
+      text-align: center;
+      margin-top: 8px;
+      font-size: 0.9rem;
+      color: #5f6368;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .status-idle { background: #e8eaed; color: #5f6368; }
+    .status-running { background: #e8f0fe; color: #1a73e8; }
+    .status-completed { background: #e6f4ea; color: #137333; }
+    .status-error { background: #fce8e6; color: #c5221f; }
+
+    .results-section {
+      margin-top: 24px;
+    }
+
+    .results-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .export-buttons {
+      display: flex;
+      gap: 10px;
+    }
+
+    .export-buttons .btn {
+      width: auto;
+      padding: 10px 20px;
+      font-size: 0.9rem;
+    }
+
+    .results-table-container {
+      overflow-x: auto;
+      border-radius: 10px;
+      border: 1px solid #e8eaed;
+    }
+
+    .results-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+
+    .results-table th,
+    .results-table td {
+      padding: 12px 16px;
+      text-align: left;
+      border-bottom: 1px solid #e8eaed;
+    }
+
+    .results-table th {
+      background: #f8f9fa;
+      font-weight: 600;
+      color: #5f6368;
+      position: sticky;
+      top: 0;
+      white-space: nowrap;
+    }
+
+    .results-table tr:hover {
+      background: #f8fbff;
+    }
+
+    .results-table td {
+      max-width: 200px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .results-table a {
+      color: #1a73e8;
+      text-decoration: none;
+    }
+
+    .results-table a:hover {
+      text-decoration: underline;
+    }
+
+    .rating-stars {
+      color: #fbbc04;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #5f6368;
+    }
+
+    .empty-state svg {
+      width: 80px;
+      height: 80px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+
+    .spinner {
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: #fff;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .pulse {
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+      border-bottom: 2px solid #e8eaed;
+      padding-bottom: 0;
+    }
+
+    .tab {
+      padding: 12px 20px;
+      border: none;
+      background: none;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #5f6368;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -2px;
+      transition: all 0.2s ease;
+    }
+
+    .tab:hover {
+      color: #1a73e8;
+    }
+
+    .tab.active {
+      color: #1a73e8;
+      border-bottom-color: #1a73e8;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .stat-card {
+      background: linear-gradient(135deg, #f8f9fa, #e8eaed);
+      padding: 16px;
+      border-radius: 12px;
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #1a73e8;
+    }
+
+    .stat-label {
+      font-size: 0.85rem;
+      color: #5f6368;
+      margin-top: 4px;
+    }
+
+    .detail-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .detail-modal.active {
+      display: flex;
+    }
+
+    .detail-modal-content {
+      background: #fff;
+      border-radius: 16px;
+      max-width: 800px;
+      width: 90%;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 24px;
+    }
+
+    .detail-modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .detail-modal-close {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #5f6368;
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    .detail-item {
+      padding: 12px;
+      background: #f8f9fa;
+      border-radius: 8px;
+    }
+
+    .detail-item.full-width {
+      grid-column: span 2;
+    }
+
+    .detail-label {
+      font-size: 0.8rem;
+      color: #5f6368;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+
+    .detail-value {
+      font-size: 1rem;
+      color: #202124;
+      word-break: break-word;
+    }
+
+    /* Map styles */
+    .map-search-container {
+      position: relative;
+      margin-bottom: 12px;
+    }
+
+    .map-search-input {
+      width: 100%;
+      padding: 10px 14px 10px 40px;
+      border: 2px solid #e8eaed;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      transition: border-color 0.2s;
+      box-sizing: border-box;
+    }
+
+    .map-search-input:focus {
+      outline: none;
+      border-color: #1a73e8;
+    }
+
+    .map-search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #666;
+    }
+
+    .map-search-btn {
+      position: absolute;
+      right: 6px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: #1a73e8;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+
+    .map-search-btn:hover {
+      background: #1557b0;
+    }
+
+    .map-search-btn:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+
+    .map-search-suggestions {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: white;
+      border: 1px solid #e8eaed;
+      border-top: none;
+      border-radius: 0 0 8px 8px;
+      max-height: 200px;
+      overflow-y: auto;
+      z-index: 1000;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      display: none;
+    }
+
+    .map-search-suggestions.active {
+      display: block;
+    }
+
+    .map-search-suggestion {
+      padding: 10px 14px;
+      cursor: pointer;
+      border-bottom: 1px solid #f0f0f0;
+      font-size: 0.85rem;
+    }
+
+    .map-search-suggestion:last-child {
+      border-bottom: none;
+    }
+
+    .map-search-suggestion:hover {
+      background: #f5f5f5;
+    }
+
+    .map-search-suggestion .suggestion-main {
+      color: #333;
+      font-weight: 500;
+    }
+
+    .map-search-suggestion .suggestion-sub {
+      color: #666;
+      font-size: 0.8rem;
+      margin-top: 2px;
+    }
+
+    #locationMap {
+      height: 280px;
+      border-radius: 10px;
+      margin-bottom: 15px;
+      border: 2px solid #e8eaed;
+      cursor: crosshair;
+    }
+
+    .map-instructions {
+      background: #e8f0fe;
+      border: 1px solid #1a73e8;
+      border-radius: 8px;
+      padding: 10px 14px;
+      margin-bottom: 12px;
+      font-size: 0.85rem;
+      color: #1a73e8;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .map-instructions svg {
+      flex-shrink: 0;
+    }
+
+    .selected-location {
+      background: #e6f4ea;
+      border: 1px solid #34a853;
+      border-radius: 8px;
+      padding: 10px 14px;
+      margin-bottom: 12px;
+      font-size: 0.85rem;
+      color: #137333;
+    }
+
+    .selected-location strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    /* Radius slider */
+    .radius-slider-container {
+      margin-top: 15px;
+    }
+
+    .radius-slider-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .radius-value {
+      background: #1a73e8;
+      color: white;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .radius-slider {
+      width: 100%;
+      height: 8px;
+      border-radius: 4px;
+      background: #e8eaed;
+      outline: none;
+      -webkit-appearance: none;
+    }
+
+    .radius-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #1a73e8;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(26, 115, 232, 0.4);
+    }
+
+    .radius-slider::-moz-range-thumb {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #1a73e8;
+      cursor: pointer;
+      border: none;
+      box-shadow: 0 2px 6px rgba(26, 115, 232, 0.4);
+    }
+
+    .radius-marks {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 8px;
+      font-size: 0.75rem;
+      color: #5f6368;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .coordinates-display {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .coord-box {
+      background: #f8f9fa;
+      border: 1px solid #e8eaed;
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 0.85rem;
+    }
+
+    .coord-box label {
+      display: block;
+      font-size: 0.7rem;
+      color: #5f6368;
+      text-transform: uppercase;
+      margin-bottom: 2px;
+    }
+
+    .coord-box span {
+      font-weight: 600;
+      color: #202124;
+    }
+
+    .clear-location-btn {
+      margin-top: 10px;
+      background: #fce8e6;
+      color: #c5221f;
+      border: 1px solid #c5221f;
+    }
+
+    .clear-location-btn:hover {
+      background: #f8d7d5;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#1a73e8" stroke-width="2">
+          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+          <circle cx="12" cy="10" r="3"/>
+        </svg>
+        Google Maps Business Scraper
+      </h1>
+      <p>Extract comprehensive business data from Google Maps</p>
+    </header>
+
+    <div class="main-content">
+      <!-- Left Panel - Search Form -->
+      <div class="card">
+        <div class="card-header">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1a73e8" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/>
+            <path d="M21 21l-4.35-4.35"/>
+          </svg>
+          <h2>Search Configuration</h2>
+        </div>
+
+        <form id="searchForm">
+          <div class="form-group">
+            <label>Business Type / Query</label>
+            <input type="text" id="query" placeholder="e.g., restaurants, dentists, hotels" required>
+          </div>
+
+          <div class="form-group">
+            <label>Search Type</label>
+            <div class="radio-group">
+              <label class="radio-option selected">
+                <input type="radio" name="searchType" value="location" checked>
+                <span>Search by Location</span>
+              </label>
+              <label class="radio-option">
+                <input type="radio" name="searchType" value="zipcode">
+                <span>Search by ZIP Code</span>
+              </label>
+              <label class="radio-option">
+                <input type="radio" name="searchType" value="radius">
+                <span>Search by Coordinates</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Location Fields -->
+          <div class="conditional-fields active" id="locationFields">
+            <div class="form-group">
+              <label>Country</label>
+              <select id="locationCountry">
+                <option value="">-- Select Country --</option>
+                <option value="US" data-name="United States">🇺🇸 United States</option>
+                <option value="CA" data-name="Canada">🇨🇦 Canada</option>
+                <option value="UK" data-name="United Kingdom">🇬🇧 United Kingdom</option>
+                <option value="AU" data-name="Australia">🇦🇺 Australia</option>
+                <option value="DE" data-name="Germany">🇩🇪 Germany</option>
+                <option value="FR" data-name="France">🇫🇷 France</option>
+                <option value="ES" data-name="Spain">🇪🇸 Spain</option>
+                <option value="IT" data-name="Italy">🇮🇹 Italy</option>
+                <option value="NL" data-name="Netherlands">🇳🇱 Netherlands</option>
+                <option value="BE" data-name="Belgium">🇧🇪 Belgium</option>
+                <option value="AT" data-name="Austria">🇦🇹 Austria</option>
+                <option value="CH" data-name="Switzerland">🇨🇭 Switzerland</option>
+                <option value="PL" data-name="Poland">🇵🇱 Poland</option>
+                <option value="PT" data-name="Portugal">🇵🇹 Portugal</option>
+                <option value="SE" data-name="Sweden">🇸🇪 Sweden</option>
+                <option value="NO" data-name="Norway">🇳🇴 Norway</option>
+                <option value="DK" data-name="Denmark">🇩🇰 Denmark</option>
+                <option value="FI" data-name="Finland">🇫🇮 Finland</option>
+                <option value="IE" data-name="Ireland">🇮🇪 Ireland</option>
+                <option value="NZ" data-name="New Zealand">🇳🇿 New Zealand</option>
+                <option value="JP" data-name="Japan">🇯🇵 Japan</option>
+                <option value="KR" data-name="South Korea">🇰🇷 South Korea</option>
+                <option value="IN" data-name="India">🇮🇳 India</option>
+                <option value="BR" data-name="Brazil">🇧🇷 Brazil</option>
+                <option value="MX" data-name="Mexico">🇲🇽 Mexico</option>
+                <option value="AR" data-name="Argentina">🇦🇷 Argentina</option>
+                <option value="CL" data-name="Chile">🇨🇱 Chile</option>
+                <option value="CO" data-name="Colombia">🇨🇴 Colombia</option>
+                <option value="ZA" data-name="South Africa">🇿🇦 South Africa</option>
+                <option value="AE" data-name="United Arab Emirates">🇦🇪 United Arab Emirates</option>
+                <option value="SA" data-name="Saudi Arabia">🇸🇦 Saudi Arabia</option>
+                <option value="SG" data-name="Singapore">🇸🇬 Singapore</option>
+                <option value="MY" data-name="Malaysia">🇲🇾 Malaysia</option>
+                <option value="TH" data-name="Thailand">🇹🇭 Thailand</option>
+                <option value="ID" data-name="Indonesia">🇮🇩 Indonesia</option>
+                <option value="PH" data-name="Philippines">🇵🇭 Philippines</option>
+                <option value="PK" data-name="Pakistan">🇵🇰 Pakistan</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>State / Province</label>
+              <input type="text" id="locationState" placeholder="e.g., California, Texas, Ontario">
+            </div>
+            <div class="form-group">
+              <label>City / Municipality</label>
+              <input type="text" id="locationCity" placeholder="e.g., New York, Los Angeles, Toronto">
+            </div>
+          </div>
+
+          <!-- ZIP Code Fields -->
+          <div class="conditional-fields" id="zipcodeFields">
+            <div class="form-group">
+              <label>Country</label>
+              <select id="zipCountry">
+                <option value="">-- Select Country --</option>
+                <option value="US" data-name="United States">🇺🇸 United States</option>
+                <option value="CA" data-name="Canada">🇨🇦 Canada</option>
+                <option value="UK" data-name="United Kingdom">🇬🇧 United Kingdom</option>
+                <option value="AU" data-name="Australia">🇦🇺 Australia</option>
+                <option value="DE" data-name="Germany">🇩🇪 Germany</option>
+                <option value="FR" data-name="France">🇫🇷 France</option>
+                <option value="ES" data-name="Spain">🇪🇸 Spain</option>
+                <option value="IT" data-name="Italy">🇮🇹 Italy</option>
+                <option value="NL" data-name="Netherlands">🇳🇱 Netherlands</option>
+                <option value="BE" data-name="Belgium">🇧🇪 Belgium</option>
+                <option value="AT" data-name="Austria">🇦🇹 Austria</option>
+                <option value="CH" data-name="Switzerland">🇨🇭 Switzerland</option>
+                <option value="PL" data-name="Poland">🇵🇱 Poland</option>
+                <option value="PT" data-name="Portugal">🇵🇹 Portugal</option>
+                <option value="SE" data-name="Sweden">🇸🇪 Sweden</option>
+                <option value="NO" data-name="Norway">🇳🇴 Norway</option>
+                <option value="DK" data-name="Denmark">🇩🇰 Denmark</option>
+                <option value="FI" data-name="Finland">🇫🇮 Finland</option>
+                <option value="IE" data-name="Ireland">🇮🇪 Ireland</option>
+                <option value="NZ" data-name="New Zealand">🇳🇿 New Zealand</option>
+                <option value="JP" data-name="Japan">🇯🇵 Japan</option>
+                <option value="KR" data-name="South Korea">🇰🇷 South Korea</option>
+                <option value="IN" data-name="India">🇮🇳 India</option>
+                <option value="BR" data-name="Brazil">🇧🇷 Brazil</option>
+                <option value="MX" data-name="Mexico">🇲🇽 Mexico</option>
+                <option value="AR" data-name="Argentina">🇦🇷 Argentina</option>
+                <option value="CL" data-name="Chile">🇨🇱 Chile</option>
+                <option value="CO" data-name="Colombia">🇨🇴 Colombia</option>
+                <option value="ZA" data-name="South Africa">🇿🇦 South Africa</option>
+                <option value="AE" data-name="United Arab Emirates">🇦🇪 United Arab Emirates</option>
+                <option value="SA" data-name="Saudi Arabia">🇸🇦 Saudi Arabia</option>
+                <option value="SG" data-name="Singapore">🇸🇬 Singapore</option>
+                <option value="MY" data-name="Malaysia">🇲🇾 Malaysia</option>
+                <option value="TH" data-name="Thailand">🇹🇭 Thailand</option>
+                <option value="ID" data-name="Indonesia">🇮🇩 Indonesia</option>
+                <option value="PH" data-name="Philippines">🇵🇭 Philippines</option>
+                <option value="PK">🇵🇰 Pakistan</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>State/Province (Optional)</label>
+              <input type="text" id="zipState" placeholder="e.g., California, New York, Ontario">
+            </div>
+            <div class="form-group">
+              <label>ZIP / Postal Code</label>
+              <input type="text" id="zipCode" placeholder="e.g., 10001, 90210, M5V 3A8">
+            </div>
+          </div>
+
+          <!-- Radius Fields with Interactive Map -->
+          <div class="conditional-fields" id="radiusFields">
+            <!-- Map Location Search -->
+            <div class="map-search-container">
+              <svg class="map-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"/>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+              </svg>
+              <input type="text" class="map-search-input" id="mapSearchInput" placeholder="Search for a location...">
+              <button type="button" class="map-search-btn" id="mapSearchBtn">Search</button>
+              <div class="map-search-suggestions" id="mapSearchSuggestions"></div>
+            </div>
+
+            <div class="map-instructions">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="16" x2="12" y2="12"/>
+                <line x1="12" y1="8" x2="12" y2="8"/>
+              </svg>
+              <span><strong>Click on the map</strong> to drop a pin at your desired location</span>
+            </div>
+            
+            <div id="locationMap"></div>
+            
+            <div id="selectedLocationInfo" class="selected-location" style="display: none;">
+              <strong>📍 Selected Location:</strong>
+              <span id="selectedLocationText">No location selected</span>
+            </div>
+
+            <div class="coordinates-display" id="coordsDisplay" style="display: none;">
+              <div class="coord-box">
+                <label>Latitude</label>
+                <span id="latDisplay">--</span>
+              </div>
+              <div class="coord-box">
+                <label>Longitude</label>
+                <span id="lngDisplay">--</span>
+              </div>
+            </div>
+
+            <input type="hidden" id="latitude">
+            <input type="hidden" id="longitude">
+
+            <div class="radius-slider-container">
+              <div class="radius-slider-header">
+                <label>Search Radius</label>
+                <span class="radius-value" id="radiusValueDisplay">2 km</span>
+              </div>
+              <input type="range" class="radius-slider" id="radiusSlider" min="1" max="5" value="2" step="0.5">
+              <div class="radius-marks">
+                <span>1 km</span>
+                <span>2 km</span>
+                <span>3 km</span>
+                <span>4 km</span>
+                <span>5 km</span>
+              </div>
+              <input type="hidden" id="radiusMeters" value="2000">
+            </div>
+
+            <button type="button" class="btn btn-secondary btn-small clear-location-btn" id="clearLocationBtn" style="display: none;">
+              ✕ Clear Selected Location
+            </button>
+          </div>
+
+          <div class="form-group">
+            <label>Maximum Results</label>
+            <input type="number" id="maxResults" value="20" min="1" max="200" placeholder="20">
+          </div>
+
+          <button type="submit" class="btn btn-primary" id="startBtn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="5 3 19 12 5 21 5 3"/>
+            </svg>
+            Start Scraping
+          </button>
+        </form>
+      </div>
+
+      <!-- Right Panel - Results & Logs -->
+      <div>
+        <div class="card">
+          <div class="card-header">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1a73e8" stroke-width="2">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+              <line x1="3" y1="9" x2="21" y2="9"/>
+              <line x1="9" y1="21" x2="9" y2="9"/>
+            </svg>
+            <h2>Progress & Results</h2>
+            <span class="status-badge status-idle" id="statusBadge">Idle</span>
+          </div>
+
+          <div class="tabs">
+            <button class="tab active" data-tab="logs">Logs</button>
+            <button class="tab" data-tab="results">Results</button>
+          </div>
+
+          <!-- Logs Tab -->
+          <div class="tab-content active" id="logsTab">
+            <div class="logs-container">
+              <div class="logs-box" id="logsBox">
+                <div class="log-entry">
+                  <span class="log-message">Ready to start scraping...</span>
+                </div>
+              </div>
+            </div>
+            <div class="progress-bar" id="progressBar" style="display: none;">
+              <div class="progress-bar-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text" id="progressText" style="display: none;">Processing...</div>
+          </div>
+
+          <!-- Results Tab -->
+          <div class="tab-content" id="resultsTab">
+            <div class="stats-grid" id="statsGrid" style="display: none;">
+              <div class="stat-card">
+                <div class="stat-value" id="totalCount">0</div>
+                <div class="stat-label">Businesses Found</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-value" id="avgRating">-</div>
+                <div class="stat-label">Avg. Rating</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-value" id="withPhone">0</div>
+                <div class="stat-label">With Phone</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-value" id="withWebsite">0</div>
+                <div class="stat-label">With Website</div>
+              </div>
+            </div>
+
+            <div class="results-header" id="resultsHeader" style="display: none;">
+              <h3>Scraped Data</h3>
+              <div class="export-buttons">
+                <button class="btn btn-secondary" id="exportCSV">
+                  📄 Export CSV
+                </button>
+                <button class="btn btn-success" id="exportJSON">
+                  📦 Export JSON
+                </button>
+              </div>
+            </div>
+
+            <div class="results-table-container" style="max-height: 500px; overflow-y: auto;">
+              <table class="results-table" id="resultsTable">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Business Name</th>
+                    <th>Phone</th>
+                    <th>Address</th>
+                    <th>Website</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="resultsBody">
+                  <tr>
+                    <td colspan="8">
+                      <div class="empty-state">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                          <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                        <p>No results yet. Configure your search and click "Start Scraping"</p>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Detail Modal -->
+  <div class="detail-modal" id="detailModal">
+    <div class="detail-modal-content">
+      <div class="detail-modal-header">
+        <h2 id="modalBusinessName">Business Details</h2>
+        <button class="detail-modal-close" id="closeModal">&times;</button>
+      </div>
+      <div class="detail-grid" id="modalContent">
+        <!-- Populated dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Leaflet JS for interactive map -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  
+  <script>
+    let currentSessionId = null;
+    let results = [];
+    let eventSource = null;
+    let map = null;
+    let marker = null;
+    let radiusCircle = null;
+    let mapInitialized = false;
+
+    // DOM Elements
+    const searchForm = document.getElementById('searchForm');
+    const startBtn = document.getElementById('startBtn');
+    const logsBox = document.getElementById('logsBox');
+    const statusBadge = document.getElementById('statusBadge');
+    const progressBar = document.getElementById('progressBar');
+    const progressFill = document.getElementById('progressFill');
+    const progressText = document.getElementById('progressText');
+    const resultsBody = document.getElementById('resultsBody');
+    const detailModal = document.getElementById('detailModal');
+
+    // Tab switching
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById(tab.dataset.tab + 'Tab').classList.add('active');
+      });
+    });
+
+    // Radio button handling
+    document.querySelectorAll('input[name="searchType"]').forEach(radio => {
+      radio.addEventListener('change', (e) => {
+        document.querySelectorAll('.radio-option').forEach(opt => opt.classList.remove('selected'));
+        e.target.closest('.radio-option').classList.add('selected');
+        
+        document.querySelectorAll('.conditional-fields').forEach(f => f.classList.remove('active'));
+        document.getElementById(e.target.value + 'Fields').classList.add('active');
+
+        // Initialize map when radius search is selected
+        if (e.target.value === 'radius' && !mapInitialized) {
+          setTimeout(initializeMap, 100);
+        }
+      });
+    });
+
+    // Initialize Leaflet Map
+    function initializeMap() {
+      if (mapInitialized) return;
+      
+      // Default center (New York)
+      const defaultCenter = [40.7128, -74.0060];
+      
+      map = L.map('locationMap').setView(defaultCenter, 13);
+      
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+      }).addTo(map);
+
+      // Click handler for dropping pin
+      map.on('click', function(e) {
+        const lat = e.latlng.lat;
+        const lng = e.latlng.lng;
+        
+        setMapLocation(lat, lng);
+      });
+
+      mapInitialized = true;
+
+      // Try to get user's current location
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const { latitude, longitude } = position.coords;
+            map.setView([latitude, longitude], 14);
+          },
+          () => {
+            // If geolocation fails, keep default
+          }
+        );
+      }
+    }
+
+    function setMapLocation(lat, lng) {
+      // Update hidden inputs
+      document.getElementById('latitude').value = lat;
+      document.getElementById('longitude').value = lng;
+      
+      // Update coordinate display
+      document.getElementById('latDisplay').textContent = lat.toFixed(6);
+      document.getElementById('lngDisplay').textContent = lng.toFixed(6);
+      document.getElementById('coordsDisplay').style.display = 'grid';
+      
+      // Show selected location info
+      document.getElementById('selectedLocationInfo').style.display = 'block';
+      document.getElementById('clearLocationBtn').style.display = 'block';
+      
+      // Reverse geocode to get address
+      reverseGeocode(lat, lng);
+      
+      // Remove existing marker and circle
+      if (marker) {
+        map.removeLayer(marker);
+      }
+      if (radiusCircle) {
+        map.removeLayer(radiusCircle);
+      }
+      
+      // Add new marker
+      marker = L.marker([lat, lng], {
+        draggable: true
+      }).addTo(map);
+      
+      // Update on drag
+      marker.on('dragend', function(e) {
+        const pos = e.target.getLatLng();
+        setMapLocation(pos.lat, pos.lng);
+      });
+      
+      // Add radius circle
+      const radiusMeters = parseFloat(document.getElementById('radiusSlider').value) * 1000;
+      radiusCircle = L.circle([lat, lng], {
+        radius: radiusMeters,
+        color: '#1a73e8',
+        fillColor: '#1a73e8',
+        fillOpacity: 0.1,
+        weight: 2
+      }).addTo(map);
+      
+      // Fit map to show circle
+      map.fitBounds(radiusCircle.getBounds(), { padding: [20, 20] });
+    }
+
+    async function reverseGeocode(lat, lng) {
+      try {
+        const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
+        const data = await response.json();
+        if (data.display_name) {
+          document.getElementById('selectedLocationText').textContent = data.display_name;
+        } else {
+          document.getElementById('selectedLocationText').textContent = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+        }
+      } catch (error) {
+        document.getElementById('selectedLocationText').textContent = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+      }
+    }
+
+    // Map search functionality
+    let searchTimeout = null;
+    const mapSearchInput = document.getElementById('mapSearchInput');
+    const mapSearchBtn = document.getElementById('mapSearchBtn');
+    const mapSearchSuggestions = document.getElementById('mapSearchSuggestions');
+
+    // Search as user types (with debounce)
+    mapSearchInput.addEventListener('input', function() {
+      clearTimeout(searchTimeout);
+      const query = this.value.trim();
+      
+      if (query.length < 3) {
+        mapSearchSuggestions.classList.remove('active');
+        return;
+      }
+      
+      searchTimeout = setTimeout(() => {
+        searchMapLocation(query, true);
+      }, 300);
+    });
+
+    // Handle Enter key
+    mapSearchInput.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        const query = this.value.trim();
+        if (query.length > 0) {
+          searchMapLocation(query, false);
+        }
+      }
+    });
+
+    // Search button click
+    mapSearchBtn.addEventListener('click', function() {
+      const query = mapSearchInput.value.trim();
+      if (query.length > 0) {
+        searchMapLocation(query, false);
+      }
+    });
+
+    // Close suggestions when clicking outside
+    document.addEventListener('click', function(e) {
+      if (!e.target.closest('.map-search-container')) {
+        mapSearchSuggestions.classList.remove('active');
+      }
+    });
+
+    async function searchMapLocation(query, showSuggestions) {
+      try {
+        mapSearchBtn.disabled = true;
+        mapSearchBtn.textContent = '...';
+        
+        const response = await fetch(
+          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5&addressdetails=1`
+        );
+        const results = await response.json();
+        
+        mapSearchBtn.disabled = false;
+        mapSearchBtn.textContent = 'Search';
+        
+        if (results.length === 0) {
+          if (showSuggestions) {
+            mapSearchSuggestions.innerHTML = '<div class="map-search-suggestion"><span class="suggestion-main">No results found</span></div>';
+            mapSearchSuggestions.classList.add('active');
+          }
+          return;
+        }
+        
+        if (showSuggestions) {
+          // Show suggestions dropdown
+          mapSearchSuggestions.innerHTML = results.map((result, index) => {
+            const mainName = result.name || result.display_name.split(',')[0];
+            const subText = result.display_name.split(',').slice(1).join(',').trim();
+            return `
+              <div class="map-search-suggestion" data-lat="${result.lat}" data-lng="${result.lon}" data-name="${result.display_name}">
+                <div class="suggestion-main">📍 ${mainName}</div>
+                <div class="suggestion-sub">${subText}</div>
+              </div>
+            `;
+          }).join('');
+          mapSearchSuggestions.classList.add('active');
+          
+          // Add click handlers to suggestions
+          mapSearchSuggestions.querySelectorAll('.map-search-suggestion').forEach(suggestion => {
+            suggestion.addEventListener('click', function() {
+              const lat = parseFloat(this.dataset.lat);
+              const lng = parseFloat(this.dataset.lng);
+              const name = this.dataset.name;
+              
+              mapSearchInput.value = name.split(',')[0];
+              mapSearchSuggestions.classList.remove('active');
+              
+              // Move map to location and set marker
+              map.setView([lat, lng], 14);
+              setMapLocation(lat, lng);
+            });
+          });
+        } else {
+          // Direct search - go to first result
+          const result = results[0];
+          const lat = parseFloat(result.lat);
+          const lng = parseFloat(result.lon);
+          
+          mapSearchInput.value = result.name || result.display_name.split(',')[0];
+          mapSearchSuggestions.classList.remove('active');
+          
+          // Move map to location and set marker
+          map.setView([lat, lng], 14);
+          setMapLocation(lat, lng);
+        }
+      } catch (error) {
+        console.error('Map search error:', error);
+        mapSearchBtn.disabled = false;
+        mapSearchBtn.textContent = 'Search';
+      }
+    }
+
+    // Clear location button
+    document.getElementById('clearLocationBtn').addEventListener('click', () => {
+      if (marker) {
+        map.removeLayer(marker);
+        marker = null;
+      }
+      if (radiusCircle) {
+        map.removeLayer(radiusCircle);
+        radiusCircle = null;
+      }
+      
+      document.getElementById('latitude').value = '';
+      document.getElementById('longitude').value = '';
+      document.getElementById('coordsDisplay').style.display = 'none';
+      document.getElementById('selectedLocationInfo').style.display = 'none';
+      document.getElementById('clearLocationBtn').style.display = 'none';
+    });
+
+    // Radius slider handler
+    document.getElementById('radiusSlider').addEventListener('input', (e) => {
+      const km = parseFloat(e.target.value);
+      const meters = km * 1000;
+      
+      document.getElementById('radiusValueDisplay').textContent = km % 1 === 0 ? `${km} km` : `${km.toFixed(1)} km`;
+      document.getElementById('radiusMeters').value = meters;
+      
+      // Update circle radius if it exists
+      if (radiusCircle && marker) {
+        radiusCircle.setRadius(meters);
+        map.fitBounds(radiusCircle.getBounds(), { padding: [20, 20] });
+      }
+    });
+
+    // Modal handling
+    document.getElementById('closeModal').addEventListener('click', () => {
+      detailModal.classList.remove('active');
+    });
+
+    detailModal.addEventListener('click', (e) => {
+      if (e.target === detailModal) {
+        detailModal.classList.remove('active');
+      }
+    });
+
+    // Country names mapping
+    const countryNames = {
+      'US': 'United States',
+      'CA': 'Canada',
+      'UK': 'United Kingdom',
+      'AU': 'Australia',
+      'DE': 'Germany',
+      'FR': 'France',
+      'ES': 'Spain',
+      'IT': 'Italy',
+      'NL': 'Netherlands',
+      'BE': 'Belgium',
+      'AT': 'Austria',
+      'CH': 'Switzerland',
+      'PL': 'Poland',
+      'PT': 'Portugal',
+      'SE': 'Sweden',
+      'NO': 'Norway',
+      'DK': 'Denmark',
+      'FI': 'Finland',
+      'IE': 'Ireland',
+      'NZ': 'New Zealand',
+      'JP': 'Japan',
+      'KR': 'South Korea',
+      'IN': 'India',
+      'BR': 'Brazil',
+      'MX': 'Mexico',
+      'AR': 'Argentina',
+      'CL': 'Chile',
+      'CO': 'Colombia',
+      'ZA': 'South Africa',
+      'AE': 'United Arab Emirates',
+      'SA': 'Saudi Arabia',
+      'SG': 'Singapore',
+      'MY': 'Malaysia',
+      'TH': 'Thailand',
+      'ID': 'Indonesia',
+      'PH': 'Philippines',
+      'PK': 'Pakistan'
+    };
+
+    // Form submission
+    searchForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const searchType = document.querySelector('input[name="searchType"]:checked').value;
+      const formData = {
+        searchType,
+        query: document.getElementById('query').value,
+        maxResults: parseInt(document.getElementById('maxResults').value) || 20,
+      };
+
+      if (searchType === 'location') {
+        const locationCountry = document.getElementById('locationCountry').value;
+        const locationState = document.getElementById('locationState').value;
+        const locationCity = document.getElementById('locationCity').value;
+        
+        // Build location string from components
+        let locationParts = [];
+        if (locationCity) locationParts.push(locationCity);
+        if (locationState) locationParts.push(locationState);
+        if (locationCountry) {
+          const countryOption = document.getElementById('locationCountry').selectedOptions[0];
+          const countryName = countryOption.dataset.name || locationCountry;
+          locationParts.push(countryName);
+        }
+        
+        if (locationParts.length === 0) {
+          alert('Please enter at least a city or select a country');
+          return;
+        }
+        
+        formData.location = locationParts.join(', ');
+        formData.locationCountry = locationCountry;
+        formData.locationCountryName = document.getElementById('locationCountry').selectedOptions[0]?.dataset.name || '';
+        formData.locationState = locationState;
+        formData.locationCity = locationCity;
+      } else if (searchType === 'zipcode') {
+        const country = document.getElementById('zipCountry').value;
+        const state = document.getElementById('zipState').value;
+        const zipCode = document.getElementById('zipCode').value;
+        
+        if (!country) {
+          alert('Please select a country for accurate ZIP code search');
+          return;
+        }
+        if (!zipCode) {
+          alert('Please enter a ZIP / Postal code');
+          return;
+        }
+        
+        formData.zipCode = zipCode;
+        formData.country = country;
+        formData.countryName = countryNames[country] || country;
+        formData.state = state;
+      } else if (searchType === 'radius') {
+        const lat = document.getElementById('latitude').value;
+        const lng = document.getElementById('longitude').value;
+        const radiusMeters = document.getElementById('radiusMeters').value;
+        
+        if (!lat || !lng) {
+          alert('Please click on the map to select a location');
+          return;
+        }
+        
+        formData.latitude = lat;
+        formData.longitude = lng;
+        formData.radiusMeters = radiusMeters;
+      }
+
+      startScraping(formData);
+    });
+
+    async function startScraping(formData) {
+      // Reset UI
+      logsBox.innerHTML = '';
+      results = [];
+      updateStatus('running');
+      startBtn.disabled = true;
+      startBtn.innerHTML = '<div class="spinner"></div> Scraping...';
+      progressBar.style.display = 'block';
+      progressText.style.display = 'block';
+      progressFill.style.width = '0%';
+      progressText.textContent = 'Initializing...';
+
+      try {
+        const response = await fetch('/api/scrape', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData),
+        });
+
+        const data = await response.json();
+        currentSessionId = data.sessionId;
+
+        // Connect to SSE for real-time logs
+        if (eventSource) {
+          eventSource.close();
+        }
+
+        eventSource = new EventSource(`/api/logs/${currentSessionId}`);
+
+        eventSource.onmessage = (event) => {
+          const logData = JSON.parse(event.data);
+          
+          if (logData.type === 'complete') {
+            handleComplete(logData.count);
+          } else if (logData.type === 'error') {
+            handleError(logData.message);
+          } else if (logData.type === 'progress') {
+            const progress = JSON.parse(logData.message);
+            updateProgress(progress.current, progress.total, progress.name);
+          } else {
+            addLog(logData);
+          }
+        };
+
+        eventSource.onerror = () => {
+          // Check if scraping completed
+          fetchResults();
+        };
+
+      } catch (error) {
+        handleError(error.message);
+      }
+    }
+
+    function addLog(logData) {
+      const entry = document.createElement('div');
+      entry.className = `log-entry ${logData.type}`;
+      
+      const time = new Date(logData.timestamp).toLocaleTimeString('en-US', { 
+        hour12: false, 
+        hour: '2-digit', 
+        minute: '2-digit', 
+        second: '2-digit' 
+      });
+      const levelTag = logData.type.toUpperCase().padEnd(7);
+      entry.innerHTML = `
+        <span class="log-time">${time}</span>
+        <span class="log-level">[${levelTag}]</span>
+        <span class="log-message">${escapeHtml(logData.message)}</span>
+      `;
+      
+      logsBox.appendChild(entry);
+      logsBox.scrollTop = logsBox.scrollHeight;
+    }
+
+    function updateProgress(current, total, name) {
+      const percent = Math.round((current / total) * 100);
+      progressFill.style.width = `${percent}%`;
+      progressText.textContent = `Processing ${current}/${total}: ${name || '...'}`;
+    }
+
+    function updateStatus(status) {
+      statusBadge.className = `status-badge status-${status}`;
+      const statusTexts = {
+        idle: 'Idle',
+        running: 'Running',
+        completed: 'Completed',
+        error: 'Error',
+      };
+      statusBadge.textContent = statusTexts[status] || status;
+    }
+
+    async function handleComplete(count) {
+      updateStatus('completed');
+      progressFill.style.width = '100%';
+      progressText.textContent = `Completed! Found ${count} businesses.`;
+      
+      startBtn.disabled = false;
+      startBtn.innerHTML = `
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="5 3 19 12 5 21 5 3"/>
+        </svg>
+        Start Scraping
+      `;
+
+      await fetchResults();
+
+      // Switch to results tab
+      document.querySelector('.tab[data-tab="results"]').click();
+    }
+
+    function handleError(message) {
+      updateStatus('error');
+      addLog({ type: 'error', message, timestamp: new Date().toISOString() });
+      
+      startBtn.disabled = false;
+      startBtn.innerHTML = `
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="5 3 19 12 5 21 5 3"/>
+        </svg>
+        Start Scraping
+      `;
+    }
+
+    async function fetchResults() {
+      if (!currentSessionId) return;
+
+      try {
+        const response = await fetch(`/api/results/${currentSessionId}`);
+        const data = await response.json();
+        
+        if (data.status === 'completed' && data.results.length > 0) {
+          results = data.results;
+          renderResults();
+        }
+      } catch (error) {
+        console.error('Error fetching results:', error);
+      }
+    }
+
+    function renderResults() {
+      if (results.length === 0) {
+        resultsBody.innerHTML = `
+          <tr>
+            <td colspan="8">
+              <div class="empty-state">
+                <p>No results found</p>
+              </div>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      // Show stats
+      document.getElementById('statsGrid').style.display = 'grid';
+      document.getElementById('resultsHeader').style.display = 'flex';
+
+      // Calculate stats
+      const totalCount = results.length;
+      const withPhone = results.filter(r => r.phone).length;
+      const withWebsite = results.filter(r => r.website).length;
+      const ratings = results.filter(r => r.rating).map(r => r.rating);
+      const avgRating = ratings.length > 0 
+        ? (ratings.reduce((a, b) => a + b, 0) / ratings.length).toFixed(1)
+        : '-';
+
+      document.getElementById('totalCount').textContent = totalCount;
+      document.getElementById('avgRating').textContent = avgRating;
+      document.getElementById('withPhone').textContent = withPhone;
+      document.getElementById('withWebsite').textContent = withWebsite;
+
+      // Render table
+      resultsBody.innerHTML = results.map((item, index) => `
+        <tr>
+          <td>${index + 1}</td>
+          <td><strong>${escapeHtml(item.name || 'N/A')}</strong></td>
+          <td>${escapeHtml(item.phone || '-')}</td>
+          <td title="${escapeHtml(item.address?.full || '')}">${escapeHtml(truncate(item.address?.full || '-', 30))}</td>
+          <td>
+            ${item.website 
+              ? `<a href="${item.website}" target="_blank">Visit →</a>`
+              : '-'}
+          </td>
+          <td>
+            <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.8rem;" onclick="showDetail(${index})">
+              View
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function showDetail(index) {
+      const item = results[index];
+      if (!item) return;
+
+      document.getElementById('modalBusinessName').textContent = item.name || 'Business Details';
+      
+      const fields = [
+        { label: 'Business Name', value: item.name },
+        { label: 'Type', value: item.type },
+        { label: 'Phone', value: item.phone },
+        { label: 'WhatsApp', value: item.whatsapp },
+        { label: 'Email', value: item.email },
+        { label: 'Website', value: item.website, isLink: true },
+        { label: 'Full Address', value: item.address?.full, fullWidth: true },
+        { label: 'Street', value: item.address?.street },
+        { label: 'City', value: item.address?.city },
+        { label: 'State', value: item.address?.state },
+        { label: 'ZIP Code', value: item.address?.zipCode },
+        { label: 'Country', value: item.address?.country },
+        { label: 'Latitude', value: item.coordinates?.latitude },
+        { label: 'Longitude', value: item.coordinates?.longitude },
+        { label: 'Rating', value: item.rating ? `${item.rating} ★` : null },
+        { label: 'Reviews Count', value: item.reviewsCount },
+        { label: 'Price Level', value: item.priceLevel },
+        { label: 'Plus Code', value: item.plusCode },
+        { label: 'Place ID', value: item.placeId },
+        { label: 'Description', value: item.description, fullWidth: true },
+        { label: 'Opening Hours', value: item.openingHours?.map(h => `${h.day}: ${h.hours}`).join('\n'), fullWidth: true },
+        { label: 'Amenities', value: item.amenities?.join(', '), fullWidth: true },
+        { label: 'Google Maps URL', value: item.googleMapsUrl, isLink: true, fullWidth: true },
+        { label: 'Image URL', value: item.imageUrl, isLink: true },
+        { label: 'Distance from Center', value: item.distanceFromCenter ? `${item.distanceFromCenter}m` : null },
+        { label: 'Scraped At', value: item.scrapedAt },
+      ];
+
+      const content = fields
+        .filter(f => f.value)
+        .map(f => `
+          <div class="detail-item ${f.fullWidth ? 'full-width' : ''}">
+            <div class="detail-label">${f.label}</div>
+            <div class="detail-value">
+              ${f.isLink 
+                ? `<a href="${escapeHtml(f.value)}" target="_blank">${escapeHtml(truncate(f.value, 50))}</a>`
+                : escapeHtml(String(f.value)).replace(/\n/g, '<br>')}
+            </div>
+          </div>
+        `).join('');
+
+      document.getElementById('modalContent').innerHTML = content;
+      detailModal.classList.add('active');
+    }
+
+    // Export handlers
+    document.getElementById('exportCSV').addEventListener('click', () => {
+      if (currentSessionId) {
+        window.location.href = `/api/export/${currentSessionId}/csv`;
+      }
+    });
+
+    document.getElementById('exportJSON').addEventListener('click', () => {
+      if (currentSessionId) {
+        window.location.href = `/api/export/${currentSessionId}/json`;
+      }
+    });
+
+    // Utility functions
+    function stripAnsiCodes(text) {
+      if (!text) return '';
+      // Remove ANSI escape codes
+      return String(text).replace(/\u001b\[\d+m/g, '').replace(/\[(\d+m|\d+;\d+m|\d+;\d+;\d+m)\]/g, '');
+    }
+
+    function escapeHtml(text) {
+      if (!text) return '';
+      const div = document.createElement('div');
+      div.textContent = stripAnsiCodes(text);
+      return div.innerHTML;
+    }
+
+    function truncate(text, maxLength) {
+      if (!text) return '';
+      return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+    }
+  </script>
+</body>
+</html>
