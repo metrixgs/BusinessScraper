@@ -300,7 +300,7 @@ export async function extractBusinessData(page) {
 
         return result;
       } catch (error) {
-        console.error('Error in page evaluation:', error);
+        console.error('Error en evaluación de página:', error);
         return result;
       }
     });
@@ -337,7 +337,7 @@ export async function extractBusinessData(page) {
 
     return data;
   } catch (error) {
-    console.error('Error extracting business data:', error);
+    console.error('Error extrayendo datos del negocio:', error);
     throw error;
   }
 }

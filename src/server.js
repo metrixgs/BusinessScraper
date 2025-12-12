@@ -94,20 +94,20 @@ app.post('/api/scrape', async (req, res) => {
 
   (async () => {
     try {
-      logger.info('Starting Google Maps Scraper...');
-      logger.log(`Search Query: "${query}"`);
-      logger.log(`Max Results: ${maxResults}`);
+      logger.info('Iniciando Extractor de Google Maps...');
+      logger.log(`Consulta de Búsqueda: "${query}"`);
+      logger.log(`Resultados Máximos: ${maxResults}`);
 
       const scraper = new GoogleMapsScraper();
 
       const originalLog = console.log;
       console.log = (...args) => {
-        const message = args.map(arg => 
+        const message = args.map(arg =>
           typeof arg === 'object' ? JSON.stringify(arg) : String(arg)
         ).join(' ');
         
         // Filter out redundant and verbose Crawlee logs
-        if (message.includes('PlaywrightCrawler:Statistics:') || 
+        if (message.includes('PlaywrightCrawler:Statistics:') ||
             message.includes('PlaywrightCrawler:AutoscaledPool:') ||
             message.includes('Final request statistics:') ||
             message.includes('request statistics:') ||
@@ -124,6 +124,41 @@ app.post('/api/scrape', async (req, res) => {
         // Remove duplicate [INFO] prefixes
         cleanMessage = cleanMessage.replace(/^\[INFO\]\s*/, '');
         
+        // Translate common English messages to Spanish
+        const translations = {
+          'Starting the crawler': 'Iniciando el crawler',
+          'All requests from the queue have been processed, the crawler will shut down': 'Todas las solicitudes de la cola han sido procesadas, el crawler se cerrará',
+          'No more results available': 'No hay más resultados disponibles',
+          'Processing batch': 'Procesando lote',
+          'Processing': 'Procesando',
+          'Found': 'Encontrados',
+          'businesses': 'negocios',
+          'Skipped': 'Omitidos',
+          'outside radius': 'fuera del radio',
+          'Searching:': 'Buscando:',
+          'Radius:': 'Radio:',
+          'Max:': 'Máx:',
+          'Starting smart radius search': 'Iniciando búsqueda inteligente por radio',
+          'Collected': 'Recolectadas',
+          'URLs': 'URLs',
+          'End of results': 'Fin de resultados',
+          'No more results': 'No hay más resultados',
+          'Processing batch': 'Procesando lote',
+          'found': 'encontrados',
+          'Progress:': 'Progreso:',
+          'Page closed': 'Página cerrada',
+          'Extraction failed': 'Extracción fallida',
+          'Request failed': 'Solicitud fallida',
+          'URL collection failed': 'Recolección de URLs fallida',
+        };
+        
+        // Apply translations
+        for (const [en, es] of Object.entries(translations)) {
+          if (cleanMessage.includes(en)) {
+            cleanMessage = cleanMessage.replace(new RegExp(en, 'g'), es);
+          }
+        }
+        
         logger.log(cleanMessage);
         originalLog.apply(console, args);
       };
@@ -131,10 +166,10 @@ app.post('/api/scrape', async (req, res) => {
       let results;
 
       if (searchType === 'location') {
-        logger.info(`Searching in: ${location}`);
-        if (locationCity) logger.info(`City: ${locationCity}`);
-        if (locationState) logger.info(`State: ${locationState}`);
-        if (locationCountryName) logger.info(`Country: ${locationCountryName}`);
+        logger.info(`Buscando en: ${location}`);
+        if (locationCity) logger.info(`Ciudad: ${locationCity}`);
+        if (locationState) logger.info(`Estado: ${locationState}`);
+        if (locationCountryName) logger.info(`País: ${locationCountryName}`);
         
         results = await scraper.search({ 
           query, 
@@ -155,12 +190,12 @@ app.post('/api/scrape', async (req, res) => {
           fullLocation = `${fullLocation}, ${countryName}`;
         }
         
-        logger.info(`Searching in ZIP code: ${zipCode}`);
-        logger.info(`Country: ${countryName || country}`);
+        logger.info(`Buscando en código postal: ${zipCode}`);
+        logger.info(`País: ${countryName || country}`);
         if (state) {
-          logger.info(`State/Province: ${state}`);
+          logger.info(`Estado/Provincia: ${state}`);
         }
-        logger.info(`Full search location: ${fullLocation}`);
+        logger.info(`Ubicación completa de búsqueda: ${fullLocation}`);
         
         results = await scraper.searchByZipCode({ 
           query, 
@@ -171,7 +206,7 @@ app.post('/api/scrape', async (req, res) => {
           maxResults 
         });
       } else if (searchType === 'radius') {
-        logger.info(`Searching within ${radiusMeters}m radius of ${latitude}, ${longitude}`);
+        logger.info(`Buscando dentro de un radio de ${radiusMeters}m de ${latitude}, ${longitude}`);
         results = await scraper.searchByRadius({
           query,
           latitude: parseFloat(latitude),
@@ -189,7 +224,7 @@ app.post('/api/scrape', async (req, res) => {
       session.results = results;
       session.status = 'completed';
 
-      logger.success(`Scraping completed! Found ${results.length} businesses.`);
+      logger.success(`¡Extracción completada! Se encontraron ${results.length} negocios.`);
 
       session.logger.clients.forEach(client => {
         client.write(`data: ${JSON.stringify({ type: 'complete', count: results.length })}\n\n`);

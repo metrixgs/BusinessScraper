@@ -9,7 +9,7 @@ async function ensureResultsDir() {
   try {
     await fs.mkdir(RESULTS_DIR, { recursive: true });
   } catch (error) {
-    console.error('Error creating results directory:', error);
+    console.error('Error creando directorio de resultados:', error);
   }
 }
 
@@ -24,12 +24,12 @@ export async function exportToJSON(data, filename = null) {
     const jsonData = JSON.stringify(data, null, 2);
     await fs.writeFile(filePath, jsonData, 'utf-8');
     
-    console.log(`Results exported to: ${filePath}`);
-    console.log(`Total records: ${data.length}`);
+    console.log(`Resultados exportados a: ${filePath}`);
+    console.log(`Registros totales: ${data.length}`);
     
     return filePath;
   } catch (error) {
-    console.error('Error exporting to JSON:', error);
+    console.error('Error exportando a JSON:', error);
     throw error;
   }
 }
@@ -107,12 +107,12 @@ export async function exportToCSV(data, filename = null) {
 
     await csvWriter.writeRecords(flattenedData);
     
-    console.log(`Results exported to: ${filePath}`);
-    console.log(`Total records: ${data.length}`);
+    console.log(`Resultados exportados a: ${filePath}`);
+    console.log(`Registros totales: ${data.length}`);
     
     return filePath;
   } catch (error) {
-    console.error('Error exporting to CSV:', error);
+    console.error('Error exportando a CSV:', error);
     throw error;
   }
 }

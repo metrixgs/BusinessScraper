@@ -80,7 +80,7 @@ export function extractCoordinatesFromUrl(url) {
 
     return null;
   } catch (error) {
-    console.error('Error extracting coordinates from URL:', error);
+    console.error('Error extrayendo coordenadas de la URL:', error);
     return null;
   }
 }

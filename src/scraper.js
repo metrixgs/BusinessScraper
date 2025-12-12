@@ -142,7 +142,7 @@ export class GoogleMapsScraper {
       zipLower.replace(/\s/g, ''), // Remove spaces
     ];
 
-    console.log(`\nSearching for businesses in ${targetZipCode}${cityName ? ` (${cityName})` : ''}...`);
+    console.log(`\nBuscando negocios en ${targetZipCode}${cityName ? ` (${cityName})` : ''}...`);
 
     const urlCollector = new PlaywrightCrawler({
       headless: this.config.headless,
@@ -180,7 +180,7 @@ export class GoogleMapsScraper {
             }
 
             if (collectedUrls.length >= targetUrls) {
-              console.log(`Collected ${collectedUrls.length} URLs`);
+              console.log(`Recolectadas ${collectedUrls.length} URLs`);
               break;
             }
 
@@ -195,18 +195,18 @@ export class GoogleMapsScraper {
               await sleep(800);
 
               const endReached = await page.evaluate(() => {
-                return document.body.innerText.includes("You've reached the end of the list");
+                return document.body.innerText.includes("Has llegado al final de la lista");
               });
 
               if (endReached) {
-                console.log(`End of results (${collectedUrls.length} URLs)`);
+                console.log(`Fin de resultados (${collectedUrls.length} URLs)`);
                 break;
               }
 
               if (currentHeight === previousHeight) {
                 noProgressCount++;
                 if (noProgressCount >= 3) {
-                  console.log(`No more results (${collectedUrls.length} URLs)`);
+                  console.log(`No hay más resultados (${collectedUrls.length} URLs)`);
                   break;
                 }
               } else {
@@ -221,14 +221,14 @@ export class GoogleMapsScraper {
       },
 
       failedRequestHandler({ request, log }) {
-        log.error(`URL collection failed: ${request.url}`);
+        log.error(`Recolección de URLs fallida: ${request.url}`);
       },
     });
 
     await urlCollector.run([searchUrl]);
 
     if (collectedUrls.length > 0) {
-      console.log(`\nProcessing ${collectedUrls.length} businesses...`);
+      console.log(`\nProcesando ${collectedUrls.length} negocios...`);
 
       const batchSize = this.config.maxConcurrency || 5;
       let currentIndex = 0;
@@ -281,40 +281,40 @@ export class GoogleMapsScraper {
               if (isInArea) {
                 if (validResults.length < maxResults) {
                   validResults.push(businessData);
-                  console.log(`[${validResults.length}/${maxResults}] ${businessData.name} (ZIP: ${addressZip || 'N/A'})`);
+                  console.log(`[${validResults.length}/${maxResults}] ${businessData.name} (Código Postal: ${addressZip || 'N/D'})`);
                 }
               } else {
                 outsideAreaCount++;
               }
             } catch (error) {
               if (!error.message.includes('closed') && !error.message.includes('Target')) {
-                log.error(`Extraction failed: ${error.message}`);
+                log.error(`Extracción fallida: ${error.message}`);
               }
             }
           },
 
           failedRequestHandler: ({ request, log }) => {
-            log.warning(`Request failed: ${request.url}`);
+            log.warning(`Solicitud fallida: ${request.url}`);
           },
         });
 
         await detailCrawler.run(batch);
 
         if (validResults.length >= maxResults) {
-          console.log(`\nFound ${maxResults} businesses!`);
+          console.log(`\n¡Encontrados ${maxResults} negocios!`);
           break;
         }
       }
     }
 
-    console.log(`\nFound ${validResults.length} businesses in ${targetZipCode}${cityName ? ` / ${cityName}` : ''}`);
+    console.log(`\nEncontrados ${validResults.length} negocios en ${targetZipCode}${cityName ? ` / ${cityName}` : ''}`);
 
     this.results = validResults.slice(0, maxResults);
     return this.results;
   }
 
   async searchByRadius({ query, latitude, longitude, radiusMeters = 1000, maxResults = 100 }) {
-    console.log(`Searching: "${query}" | Radius: ${radiusMeters}m at [${latitude}, ${longitude}] | Max: ${maxResults}`);
+    console.log(`Buscando: "${query}" | Radio: ${radiusMeters}m en [${latitude}, ${longitude}] | Máx: ${maxResults}`);
 
     const searchUrl = buildSearchUrl({
       query,
@@ -333,7 +333,7 @@ export class GoogleMapsScraper {
     const collectedUrls = [];
     let outsideRadiusCount = 0;
 
-    console.log(`Starting smart radius search...`);
+    console.log(`Iniciando búsqueda inteligente por radio...`);
 
     const urlCollector = new PlaywrightCrawler({
       headless: this.config.headless,
@@ -371,7 +371,7 @@ export class GoogleMapsScraper {
             }
 
             if (collectedUrls.length >= targetUrls) {
-              console.log(`Collected ${collectedUrls.length} URLs, starting processing...`);
+              console.log(`Recolectadas ${collectedUrls.length} URLs, iniciando procesamiento...`);
               break;
             }
 
@@ -386,18 +386,18 @@ export class GoogleMapsScraper {
               await sleep(1000);
 
               const endReached = await page.evaluate(() => {
-                return document.body.innerText.includes("You've reached the end of the list");
+                return document.body.innerText.includes("Has llegado al final de la lista");
               });
 
               if (endReached) {
-                console.log(`End of results reached with ${collectedUrls.length} URLs`);
+                console.log(`Fin de resultados alcanzado con ${collectedUrls.length} URLs`);
                 break;
               }
 
               if (currentHeight === previousHeight) {
                 noProgressCount++;
                 if (noProgressCount >= 3) {
-                  console.log(`No more results available, collected ${collectedUrls.length} URLs`);
+                  console.log(`No hay más resultados disponibles, recolectadas ${collectedUrls.length} URLs`);
                   break;
                 }
               } else {
@@ -412,14 +412,14 @@ export class GoogleMapsScraper {
       },
 
       failedRequestHandler({ request, log }) {
-        log.error(`URL collection failed: ${request.url}`);
+        log.error(`Recolección de URLs fallida: ${request.url}`);
       },
     });
 
     await urlCollector.run([searchUrl]);
 
     if (collectedUrls.length > 0) {
-      console.log(`Processing ${collectedUrls.length} businesses...`);
+      console.log(`Procesando ${collectedUrls.length} negocios...`);
 
       const batchSize = this.config.maxConcurrency || 3;
       let currentIndex = 0;
@@ -435,7 +435,7 @@ export class GoogleMapsScraper {
         const batch = collectedUrls.slice(currentIndex, currentIndex + estimatedBatchSize);
         currentIndex += estimatedBatchSize;
 
-        console.log(`Processing batch ${Math.ceil(currentIndex / estimatedBatchSize)} (${validResults.length}/${maxResults} found)...`);
+        console.log(`Procesando lote ${Math.ceil(currentIndex / estimatedBatchSize)} (${validResults.length}/${maxResults} encontrados)...`);
 
         const detailCrawler = new PlaywrightCrawler({
           headless: this.config.headless,
@@ -477,13 +477,13 @@ export class GoogleMapsScraper {
               }
             } catch (error) {
               if (!error.message.includes('closed') && !error.message.includes('Target')) {
-                log.error(`Extraction failed: ${error.message}`);
+                log.error(`Extracción fallida: ${error.message}`);
               }
             }
           },
 
           failedRequestHandler: ({ request, log }) => {
-            log.warning(`Request failed: ${request.url}`);
+            log.warning(`Solicitud fallida: ${request.url}`);
           },
         });
 
@@ -495,9 +495,9 @@ export class GoogleMapsScraper {
       }
     }
 
-    console.log(`Found ${validResults.length} businesses within ${radiusMeters}m`);
+    console.log(`Encontrados ${validResults.length} negocios dentro de ${radiusMeters}m`);
     if (outsideRadiusCount > 0) {
-      console.log(`Skipped ${outsideRadiusCount} outside radius`);
+      console.log(`Omitidos ${outsideRadiusCount} fuera del radio`);
     }
 
     this.results = validResults.slice(0, maxResults);
@@ -527,7 +527,7 @@ export class GoogleMapsScraper {
       },
 
       failedRequestHandler({ request, log }) {
-        log.error(`Request failed: ${request.url}`);
+        log.error(`Solicitud fallida: ${request.url}`);
       },
     });
 
@@ -553,18 +553,18 @@ export class GoogleMapsScraper {
 
             this.results.push(businessData);
 
-            console.log(`Progress: ${this.results.length}/${businessUrls.length} - ${businessData.name}`);
+            console.log(`Progreso: ${this.results.length}/${businessUrls.length} - ${businessData.name}`);
           } catch (error) {
             if (error.message.includes('closed') || error.message.includes('Target')) {
-              log.warning(`Page closed: ${request.url}`);
+              log.warning(`Página cerrada: ${request.url}`);
             } else {
-              log.error(`Extraction failed: ${error.message}`);
+              log.error(`Extracción fallida: ${error.message}`);
             }
           }
         },
 
         failedRequestHandler: ({ request, log }) => {
-          log.warning(`Request failed (retrying): ${request.url}`);
+          log.warning(`Solicitud fallida (reintentando): ${request.url}`);
         },
       });
 
@@ -576,7 +576,7 @@ export class GoogleMapsScraper {
 
   async export(format = 'json', filename = null) {
     if (this.results.length === 0) {
-      console.log('No results to export');
+      console.log('No hay resultados para exportar');
       return;
     }
 
