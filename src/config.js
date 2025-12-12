@@ -7,7 +7,7 @@ export const config = {
   maxResults: parseInt(process.env.MAX_RESULTS || '100', 10),
   timeout: parseInt(process.env.TIMEOUT || '30000', 10),
   defaultRadius: 1000,
-  maxConcurrency: 8, // Aumentado para procesamiento más rápido
+  maxConcurrency: 10, // Aumentado para procesamiento más rápido
   retryCount: 1,     // Reintentos reducidos para velocidad
 };
 
