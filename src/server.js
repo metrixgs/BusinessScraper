@@ -315,8 +315,8 @@ app.get('/api/health', (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`\nGoogle Maps Scraper Web Interface`);
-  console.log(`Server running on http://localhost:${PORT}\n`);
+  console.log(`\nInterfaz Web de Google Maps Scraper`);
+  console.log(`Servidor ejecutándose en http://localhost:${PORT}\n`);
 });
 
 export default app;

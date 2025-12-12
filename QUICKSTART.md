@@ -1,188 +1,187 @@
-# Quick Start - Web Testing Guide
+# Inicio Rápido - Guía de Pruebas Web
 
-Make sure you have install the nodejs of version greater than 18
-Latest version should be better
+Asegúrate de tener instalado Node.js versión mayor a 18
+La última versión es mejor
 
-## Setup
+## Configuración
 
 ```bash
-# Install dependencies
+# Instalar dependencias
 npm install
 
-# Start the web server
+# Iniciar el servidor web
 npm start
 ```
 
-Open your browser: **`http://localhost:3000`**
+Abre tu navegador: **`http://localhost:3000`**
 
 ---
 
-## Testing via Web Interface
+## Pruebas mediante la Interfaz Web
 
-### 1️⃣ Location-Based Search
+### 1️⃣ Búsqueda Basada en Ubicación
 
-**Steps:**
-1. Open `http://localhost:3000`
-2. Select search type: **Location**
-3. Enter the following data:
+**Pasos:**
+1. Abre `http://localhost:3000`
+2. Selecciona tipo de búsqueda: **Ubicación**
+3. Ingresa los siguientes datos:
 
-| Field | Test Value 1 | Test Value 2 | Test Value 3 |
+| Campo | Valor de Prueba 1 | Valor de Prueba 2 | Valor de Prueba 3 |
 |-------|--------------|--------------|--------------|
-| Search Query | pizza | restaurants | coffee shops |
-| Location | Chicago, IL | New York, NY | Los Angeles, CA |
-| Max Results | 10 | 15 | 20 |
+| Consulta de Búsqueda | pizza | restaurantes | cafeterías |
+| Ubicación | Chicago, IL | Nueva York, NY | Los Ángeles, CA |
+| Máx. Resultados | 10 | 15 | 20 |
 
-**Expected Results:** 10-20 businesses with full details
+**Resultados Esperados:** 10-20 negocios con detalles completos
 
 ---
 
-### 2️⃣ ZIP Code Search
+### 2️⃣ Búsqueda por Código Postal
 
-**Steps:**
-1. Open `http://localhost:3000`
-2. Select search type: **ZIP Code**
-3. Enter the following data:
+**Pasos:**
+1. Abre `http://localhost:3000`
+2. Selecciona tipo de búsqueda: **Código Postal**
+3. Ingresa los siguientes datos:
 
-| Field | Test Value 1 | Test Value 2 | Test Value 3 | Test Value 4 |
+| Campo | Valor de Prueba 1 | Valor de Prueba 2 | Valor de Prueba 3 | Valor de Prueba 4 |
 |-------|--------------|--------------|--------------|--------------|
-| Search Query | dentists | hotels | restaurants | pizza |
-| ZIP Code | 60614 | 10001 | 90210 | 94102 |
-| Max Results | 10 | 15 | 10 | 15 |
+| Consulta de Búsqueda | dentistas | hoteles | restaurantes | pizza |
+| Código Postal | 60614 | 10001 | 90210 | 94102 |
+| Máx. Resultados | 10 | 15 | 10 | 15 |
 
-**Expected Results:** 8-15 businesses within the ZIP code
+**Resultados Esperados:** 8-15 negocios dentro del código postal
 
 ---
 
-### 3️⃣ Radius-Based Search (Recommended)
+### 3️⃣ Búsqueda por Radio (Recomendada)
 
-**Steps:**
-1. Open `http://localhost:3000`
-2. Select search type: **Radius**
-3. Enter the following data:
+**Pasos:**
+1. Abre `http://localhost:3000`
+2. Selecciona tipo de búsqueda: **Radio**
+3. Ingresa los siguientes datos:
 
-#### **Test Location 1: Chicago**
-| Field | Value |
+#### **Ubicación de Prueba 1: Chicago**
+| Campo | Valor |
 |-------|-------|
-| Search Query | pizza |
-| Latitude | 41.8781 |
-| Longitude | -87.6298 |
-| Radius (meters) | 5000 |
-| Max Results | 20 |
+| Consulta de Búsqueda | pizza |
+| Latitud | 41.8781 |
+| Longitud | -87.6298 |
+| Radio (metros) | 5000 |
+| Máx. Resultados | 20 |
 
-**Expected Results:** 15-20 pizza places within 5km radius
+**Resultados Esperados:** 15-20 pizzerías dentro de un radio de 5km
 
 ---
 
-#### **Test Location 2: New York**
-| Field | Value |
+#### **Ubicación de Prueba 2: Nueva York**
+| Campo | Valor |
 |-------|-------|
-| Search Query | restaurants |
-| Latitude | 40.7128 |
-| Longitude | -74.0060 |
-| Radius (meters) | 3000 |
-| Max Results | 20 |
+| Consulta de Búsqueda | restaurantes |
+| Latitud | 40.7128 |
+| Longitud | -74.0060 |
+| Radio (metros) | 3000 |
+| Máx. Resultados | 20 |
 
-**Expected Results:** 15-20 restaurants within 3km radius
+**Resultados Esperados:** 15-20 restaurantes dentro de un radio de 3km
 
 ---
 
-#### **Test Location 3: Los Angeles**
-| Field | Value |
+#### **Ubicación de Prueba 3: Los Ángeles**
+| Campo | Valor |
 |-------|-------|
-| Search Query | coffee shops |
-| Latitude | 34.0522 |
-| Longitude | -118.2437 |
-| Radius (meters) | 5000 |
-| Max Results | 20 |
+| Consulta de Búsqueda | cafeterías |
+| Latitud | 34.0522 |
+| Longitud | -118.2437 |
+| Radio (metros) | 5000 |
+| Máx. Resultados | 20 |
 
-**Expected Results:** 15-20 coffee shops within 5km radius
+**Resultados Esperados:** 15-20 cafeterías dentro de un radio de 5km
 
 ---
 
-#### **Test Location 4: San Francisco**
-| Field | Value |
+#### **Ubicación de Prueba 4: San Francisco**
+| Campo | Valor |
 |-------|-------|
-| Search Query | dentists |
-| Latitude | 37.7749 |
-| Longitude | -122.4194 |
-| Radius (meters) | 2000 |
-| Max Results | 15 |
+| Consulta de Búsqueda | dentistas |
+| Latitud | 37.7749 |
+| Longitud | -122.4194 |
+| Radio (metros) | 2000 |
+| Máx. Resultados | 15 |
 
-**Expected Results:** 8-15 dentists within 2km radius
+**Resultados Esperados:** 8-15 dentistas dentro de un radio de 2km
 
 ---
 
-#### **Test Location 5: Houston**
-| Field | Value |
+#### **Ubicación de Prueba 5: Houston**
+| Campo | Valor |
 |-------|-------|
-| Search Query | hotels |
-| Latitude | 29.7604 |
-| Longitude | -95.3698 |
-| Radius (meters) | 5000 |
-| Max Results | 15 |
+| Consulta de Búsqueda | hoteles |
+| Latitud | 29.7604 |
+| Longitud | -95.3698 |
+| Radio (metros) | 5000 |
+| Máx. Resultados | 15 |
 
-**Expected Results:** 10-15 hotels within 5km radius
-
----
-
-## Web Interface Features
-
-### During Scraping:
-- ✅ Real-time progress updates
-- ✅ Business names as they're extracted
-- ✅ Live status bar
-- ✅ Error notifications (if any)
-
-### After Completion:
-- ✅ Full results displayed
-- ✅ Download as JSON
-- ✅ Download as CSV
-- ✅ View full business details
-- ✅ Copy to clipboard
+**Resultados Esperados:** 10-15 hoteles dentro de un radio de 5km
 
 ---
 
-## Data Fields in Results
+## Características de la Interfaz Web
 
-Each business includes:
-- **Name & Type** - Business name and category
-- **Contact** - Phone, WhatsApp, Email, Website
-- **Address** - Full address with components
-- **Location** - Latitude, Longitude, Distance from center
-- **Hours** - Opening hours by day
-- **Rating** - Star rating and review count
-- **Details** - Price level, description, amenities
-- **Images** - Business photos
-- **Metadata** - Place ID, Plus code, Maps URL
+### Durante el Scraping:
+- ✅ Actualizaciones de progreso en tiempo real
+- ✅ Nombres de negocios a medida que se extraen
+- ✅ Barra de estado en vivo
+- ✅ Notificaciones de error (si las hay)
 
----
-
-## Testing Checklist
-
-### Radius Search (Most Reliable)
-- [ ] Chicago pizza search (41.8781, -87.6298)
-- [ ] New York restaurants (40.7128, -74.0060)
-- [ ] LA coffee shops (34.0522, -118.2437)
-- [ ] SF dentists (37.7749, -122.4194)
-- [ ] Houston hotels (29.7604, -95.3698)
-
-### Location Search
-- [ ] "pizza" in Chicago, IL
-- [ ] "restaurants" in New York, NY
-- [ ] "hotels" in Los Angeles, CA
-
-### ZIP Code Search
-- [ ] "dentists" in 60614
-- [ ] "restaurants" in 10001
-- [ ] "pizza" in 90210
+### Después de Completar:
+- ✅ Resultados completos mostrados
+- ✅ Descargar como JSON
+- ✅ Descargar como CSV
+- ✅ Ver detalles completos del negocio
+- ✅ Copiar al portapapeles
 
 ---
 
-## Tips
+## Campos de Datos en los Resultados
 
-1. **Start with radius search** - Most reliable results
-2. **Use max results 15-20** - Balances speed vs. completeness
-3. **Wait for "Complete" status** - Don't refresh mid-scrape
-4. **Export immediately** - Save results before leaving page
-5. **Check distances** - Verify results are within radius
+Cada negocio incluye:
+- **Nombre y Tipo** - Nombre del negocio y categoría
+- **Contacto** - Teléfono, WhatsApp, Email, Sitio web
+- **Dirección** - Dirección completa con componentes
+- **Ubicación** - Latitud, Longitud, Distancia desde el centro
+- **Horarios** - Horario de apertura por día
+- **Calificación** - Calificación por estrellas y cantidad de reseñas
+- **Detalles** - Nivel de precios, descripción, servicios
+- **Imágenes** - Fotos del negocio
+- **Metadatos** - Place ID, Código Plus, URL de Maps
 
+---
+
+## Lista de Verificación de Pruebas
+
+### Búsqueda por Radio (Más Confiable)
+- [ ] Búsqueda de pizza en Chicago (41.8781, -87.6298)
+- [ ] Restaurantes en Nueva York (40.7128, -74.0060)
+- [ ] Cafeterías en Los Ángeles (34.0522, -118.2437)
+- [ ] Dentistas en San Francisco (37.7749, -122.4194)
+- [ ] Hoteles en Houston (29.7604, -95.3698)
+
+### Búsqueda por Ubicación
+- [ ] "pizza" en Chicago, IL
+- [ ] "restaurantes" en Nueva York, NY
+- [ ] "hoteles" en Los Ángeles, CA
+
+### Búsqueda por Código Postal
+- [ ] "dentistas" en 60614
+- [ ] "restaurantes" en 10001
+- [ ] "pizza" en 90210
+
+---
+
+## Consejos
+
+1. **Comienza con búsqueda por radio** - Resultados más confiables
+2. **Usa máximo 15-20 resultados** - Equilibra velocidad vs. completitud
+3. **Espera el estado "Completado"** - No refresques durante el scraping
+4. **Exporta inmediatamente** - Guarda los resultados antes de salir de la página
+5. **Verifica distancias** - Confirma que los resultados estén dentro del radio

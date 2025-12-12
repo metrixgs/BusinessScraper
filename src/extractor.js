@@ -6,11 +6,11 @@ export async function extractBusinessData(page) {
       throw new Error('Page is already closed');
     }
 
-    // Reduced timeout for faster extraction
+    // Tiempo de espera reducido para extracción más rápida
     await page.waitForSelector('[role="main"]', { timeout: 10000 }).catch(() => null);
     await sleep(500);
 
-    // Try to expand hours section for complete data
+    // Intentar expandir la sección de horarios para datos completos
     try {
       if (!page.isClosed()) {
         const hoursButton = await page.$('button[aria-label*="Hours"], button[data-item-id*="hours"]');
@@ -20,7 +20,7 @@ export async function extractBusinessData(page) {
         }
       }
     } catch (error) {
-      // Silently ignore
+      // Ignorar silenciosamente
     }
 
     if (page.isClosed()) {
@@ -384,7 +384,7 @@ export async function extractBusinessUrls(page, maxResults = 100) {
     let extractedUrls = await extractUrls();
     extractedUrls.forEach(url => urls.add(url));
 
-    console.log(`Initial: ${urls.size} listings`);
+    console.log(`Inicial: ${urls.size} listados`);
 
     if (urls.size >= maxResults) {
       return Array.from(urls).slice(0, maxResults);
@@ -402,7 +402,7 @@ export async function extractBusinessUrls(page, maxResults = 100) {
         return el.scrollHeight;
       });
 
-      await sleep(800); // Reduced from 1500ms
+      await sleep(800); // Reducido desde 1500ms
 
       const endReached = await page.evaluate(() => {
         const endText = document.body.innerText;
@@ -411,7 +411,7 @@ export async function extractBusinessUrls(page, maxResults = 100) {
       });
 
       if (endReached) {
-        console.log('End of results');
+        console.log('Fin de resultados');
         break;
       }
 
@@ -421,8 +421,8 @@ export async function extractBusinessUrls(page, maxResults = 100) {
 
       if (currentHeight === previousHeight && urls.size === prevSize) {
         noScrollProgress++;
-        if (noScrollProgress >= 3) { // Reduced from 5
-          console.log('No more results');
+        if (noScrollProgress >= 3) { // Reducido desde 5
+          console.log('No hay más resultados');
           break;
         }
       } else {
@@ -433,14 +433,14 @@ export async function extractBusinessUrls(page, maxResults = 100) {
       scrollAttempts++;
 
       if (scrollAttempts % 5 === 0) {
-        console.log(`Scrolling... ${urls.size} listings`);
+        console.log(`Desplazando... ${urls.size} listados`);
       }
     }
 
-    console.log(`Collected ${urls.size} listings`);
+    console.log(`Recolectados ${urls.size} listados`);
     return Array.from(urls).slice(0, maxResults);
   } catch (error) {
-    console.error('Error extracting URLs:', error.message);
+    console.error('Error extrayendo URLs:', error.message);
     return Array.from(urls);
   }
 }

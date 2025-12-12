@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Google Maps Business Scraper</title>
-  <!-- Leaflet CSS for interactive map -->
+  <title>Extractor de Negocios de Google Maps</title>
+  <!-- Leaflet CSS para mapa interactivo -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <style>
     * {
@@ -811,9 +811,9 @@
           <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
           <circle cx="12" cy="10" r="3"/>
         </svg>
-        Google Maps Business Scraper
+        Extractor de Negocios de Google Maps
       </h1>
-      <p>Extract comprehensive business data from Google Maps</p>
+      <p>Extrae datos completos de negocios de Google Maps</p>
     </header>
 
     <div class="main-content">
@@ -824,29 +824,29 @@
             <circle cx="11" cy="11" r="8"/>
             <path d="M21 21l-4.35-4.35"/>
           </svg>
-          <h2>Search Configuration</h2>
+          <h2>Configuración de Búsqueda</h2>
         </div>
 
         <form id="searchForm">
           <div class="form-group">
-            <label>Business Type / Query</label>
-            <input type="text" id="query" placeholder="e.g., restaurants, dentists, hotels" required>
+            <label>Tipo de Negocio / Consulta</label>
+            <input type="text" id="query" placeholder="ej. restaurantes, dentistas, hoteles" required>
           </div>
 
           <div class="form-group">
-            <label>Search Type</label>
+            <label>Tipo de Búsqueda</label>
             <div class="radio-group">
               <label class="radio-option selected">
                 <input type="radio" name="searchType" value="location" checked>
-                <span>Search by Location</span>
+                <span>Buscar por Ubicación</span>
               </label>
               <label class="radio-option">
                 <input type="radio" name="searchType" value="zipcode">
-                <span>Search by ZIP Code</span>
+                <span>Buscar por Código Postal</span>
               </label>
               <label class="radio-option">
                 <input type="radio" name="searchType" value="radius">
-                <span>Search by Coordinates</span>
+                <span>Buscar por Coordenadas</span>
               </label>
             </div>
           </div>
@@ -854,9 +854,9 @@
           <!-- Location Fields -->
           <div class="conditional-fields active" id="locationFields">
             <div class="form-group">
-              <label>Country</label>
+              <label>País</label>
               <select id="locationCountry">
-                <option value="">-- Select Country --</option>
+                <option value="">-- Seleccionar País --</option>
                 <option value="US" data-name="United States">🇺🇸 United States</option>
                 <option value="CA" data-name="Canada">🇨🇦 Canada</option>
                 <option value="UK" data-name="United Kingdom">🇬🇧 United Kingdom</option>
@@ -897,21 +897,21 @@
               </select>
             </div>
             <div class="form-group">
-              <label>State / Province</label>
-              <input type="text" id="locationState" placeholder="e.g., California, Texas, Ontario">
+              <label>Estado / Provincia</label>
+              <input type="text" id="locationState" placeholder="ej. California, Texas, Ontario">
             </div>
             <div class="form-group">
-              <label>City / Municipality</label>
-              <input type="text" id="locationCity" placeholder="e.g., New York, Los Angeles, Toronto">
+              <label>Ciudad / Municipio</label>
+              <input type="text" id="locationCity" placeholder="ej. Nueva York, Los Ángeles, Toronto">
             </div>
           </div>
 
           <!-- ZIP Code Fields -->
           <div class="conditional-fields" id="zipcodeFields">
             <div class="form-group">
-              <label>Country</label>
+              <label>País</label>
               <select id="zipCountry">
-                <option value="">-- Select Country --</option>
+                <option value="">-- Seleccionar País --</option>
                 <option value="US" data-name="United States">🇺🇸 United States</option>
                 <option value="CA" data-name="Canada">🇨🇦 Canada</option>
                 <option value="UK" data-name="United Kingdom">🇬🇧 United Kingdom</option>
@@ -952,12 +952,12 @@
               </select>
             </div>
             <div class="form-group">
-              <label>State/Province (Optional)</label>
-              <input type="text" id="zipState" placeholder="e.g., California, New York, Ontario">
+              <label>Estado/Provincia (Opcional)</label>
+              <input type="text" id="zipState" placeholder="ej. California, Nueva York, Ontario">
             </div>
             <div class="form-group">
-              <label>ZIP / Postal Code</label>
-              <input type="text" id="zipCode" placeholder="e.g., 10001, 90210, M5V 3A8">
+              <label>Código Postal</label>
+              <input type="text" id="zipCode" placeholder="ej. 10001, 90210, M5V 3A8">
             </div>
           </div>
 
@@ -969,8 +969,8 @@
                 <circle cx="11" cy="11" r="8"/>
                 <line x1="21" y1="21" x2="16.65" y2="16.65"/>
               </svg>
-              <input type="text" class="map-search-input" id="mapSearchInput" placeholder="Search for a location...">
-              <button type="button" class="map-search-btn" id="mapSearchBtn">Search</button>
+              <input type="text" class="map-search-input" id="mapSearchInput" placeholder="Buscar una ubicación...">
+              <button type="button" class="map-search-btn" id="mapSearchBtn">Buscar</button>
               <div class="map-search-suggestions" id="mapSearchSuggestions"></div>
             </div>
 
@@ -980,23 +980,23 @@
                 <line x1="12" y1="16" x2="12" y2="12"/>
                 <line x1="12" y1="8" x2="12" y2="8"/>
               </svg>
-              <span><strong>Click on the map</strong> to drop a pin at your desired location</span>
+              <span><strong>Haz clic en el mapa</strong> para colocar un pin en la ubicación deseada</span>
             </div>
             
             <div id="locationMap"></div>
             
             <div id="selectedLocationInfo" class="selected-location" style="display: none;">
-              <strong>📍 Selected Location:</strong>
-              <span id="selectedLocationText">No location selected</span>
+              <strong>📍 Ubicación Seleccionada:</strong>
+              <span id="selectedLocationText">Ninguna ubicación seleccionada</span>
             </div>
 
             <div class="coordinates-display" id="coordsDisplay" style="display: none;">
               <div class="coord-box">
-                <label>Latitude</label>
+                <label>Latitud</label>
                 <span id="latDisplay">--</span>
               </div>
               <div class="coord-box">
-                <label>Longitude</label>
+                <label>Longitud</label>
                 <span id="lngDisplay">--</span>
               </div>
             </div>
@@ -1006,7 +1006,7 @@
 
             <div class="radius-slider-container">
               <div class="radius-slider-header">
-                <label>Search Radius</label>
+                <label>Radio de Búsqueda</label>
                 <span class="radius-value" id="radiusValueDisplay">2 km</span>
               </div>
               <input type="range" class="radius-slider" id="radiusSlider" min="1" max="5" value="2" step="0.5">
@@ -1021,12 +1021,12 @@
             </div>
 
             <button type="button" class="btn btn-secondary btn-small clear-location-btn" id="clearLocationBtn" style="display: none;">
-              ✕ Clear Selected Location
+              ✕ Limpiar Ubicación Seleccionada
             </button>
           </div>
 
           <div class="form-group">
-            <label>Maximum Results</label>
+            <label>Resultados Máximos</label>
             <input type="number" id="maxResults" value="20" min="1" max="200" placeholder="20">
           </div>
 
@@ -1034,7 +1034,7 @@
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <polygon points="5 3 19 12 5 21 5 3"/>
             </svg>
-            Start Scraping
+            Iniciar Extracción
           </button>
         </form>
       </div>
@@ -1048,13 +1048,13 @@
               <line x1="3" y1="9" x2="21" y2="9"/>
               <line x1="9" y1="21" x2="9" y2="9"/>
             </svg>
-            <h2>Progress & Results</h2>
-            <span class="status-badge status-idle" id="statusBadge">Idle</span>
+            <h2>Progreso y Resultados</h2>
+            <span class="status-badge status-idle" id="statusBadge">Inactivo</span>
           </div>
 
           <div class="tabs">
-            <button class="tab active" data-tab="logs">Logs</button>
-            <button class="tab" data-tab="results">Results</button>
+            <button class="tab active" data-tab="logs">Registros</button>
+            <button class="tab" data-tab="results">Resultados</button>
           </div>
 
           <!-- Logs Tab -->
@@ -1062,14 +1062,14 @@
             <div class="logs-container">
               <div class="logs-box" id="logsBox">
                 <div class="log-entry">
-                  <span class="log-message">Ready to start scraping...</span>
+                  <span class="log-message">Listo para iniciar extracción...</span>
                 </div>
               </div>
             </div>
             <div class="progress-bar" id="progressBar" style="display: none;">
               <div class="progress-bar-fill" id="progressFill"></div>
             </div>
-            <div class="progress-text" id="progressText" style="display: none;">Processing...</div>
+            <div class="progress-text" id="progressText" style="display: none;">Procesando...</div>
           </div>
 
           <!-- Results Tab -->
@@ -1077,30 +1077,30 @@
             <div class="stats-grid" id="statsGrid" style="display: none;">
               <div class="stat-card">
                 <div class="stat-value" id="totalCount">0</div>
-                <div class="stat-label">Businesses Found</div>
+                <div class="stat-label">Negocios Encontrados</div>
               </div>
               <div class="stat-card">
                 <div class="stat-value" id="avgRating">-</div>
-                <div class="stat-label">Avg. Rating</div>
+                <div class="stat-label">Puntuación Promedio</div>
               </div>
               <div class="stat-card">
                 <div class="stat-value" id="withPhone">0</div>
-                <div class="stat-label">With Phone</div>
+                <div class="stat-label">Con Teléfono</div>
               </div>
               <div class="stat-card">
                 <div class="stat-value" id="withWebsite">0</div>
-                <div class="stat-label">With Website</div>
+                <div class="stat-label">Con Sitio Web</div>
               </div>
             </div>
 
             <div class="results-header" id="resultsHeader" style="display: none;">
-              <h3>Scraped Data</h3>
+              <h3>Datos Extraídos</h3>
               <div class="export-buttons">
                 <button class="btn btn-secondary" id="exportCSV">
-                  📄 Export CSV
+                  📄 Exportar CSV
                 </button>
                 <button class="btn btn-success" id="exportJSON">
-                  📦 Export JSON
+                  📦 Exportar JSON
                 </button>
               </div>
             </div>
@@ -1110,11 +1110,11 @@
                 <thead>
                   <tr>
                     <th>#</th>
-                    <th>Business Name</th>
-                    <th>Phone</th>
-                    <th>Address</th>
-                    <th>Website</th>
-                    <th>Actions</th>
+                    <th>Nombre del Negocio</th>
+                    <th>Teléfono</th>
+                    <th>Dirección</th>
+                    <th>Sitio Web</th>
+                    <th>Acciones</th>
                   </tr>
                 </thead>
                 <tbody id="resultsBody">
@@ -1124,7 +1124,7 @@
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                           <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                         </svg>
-                        <p>No results yet. Configure your search and click "Start Scraping"</p>
+                        <p>Aún no hay resultados. Configura tu búsqueda y haz clic en "Iniciar Extracción"</p>
                       </div>
                     </td>
                   </tr>
@@ -1141,7 +1141,7 @@
   <div class="detail-modal" id="detailModal">
     <div class="detail-modal-content">
       <div class="detail-modal-header">
-        <h2 id="modalBusinessName">Business Details</h2>
+        <h2 id="modalBusinessName">Detalles del Negocio</h2>
         <button class="detail-modal-close" id="closeModal">&times;</button>
       </div>
       <div class="detail-grid" id="modalContent">
@@ -1358,11 +1358,11 @@
         const results = await response.json();
         
         mapSearchBtn.disabled = false;
-        mapSearchBtn.textContent = 'Search';
+        mapSearchBtn.textContent = 'Buscar';
         
         if (results.length === 0) {
           if (showSuggestions) {
-            mapSearchSuggestions.innerHTML = '<div class="map-search-suggestion"><span class="suggestion-main">No results found</span></div>';
+            mapSearchSuggestions.innerHTML = '<div class="map-search-suggestion"><span class="suggestion-main">No se encontraron resultados</span></div>';
             mapSearchSuggestions.classList.add('active');
           }
           return;
@@ -1413,7 +1413,7 @@
       } catch (error) {
         console.error('Map search error:', error);
         mapSearchBtn.disabled = false;
-        mapSearchBtn.textContent = 'Search';
+        mapSearchBtn.textContent = 'Buscar';
       }
     }
 
@@ -1529,7 +1529,7 @@
         }
         
         if (locationParts.length === 0) {
-          alert('Please enter at least a city or select a country');
+          alert('Por favor ingresa al menos una ciudad o selecciona un país');
           return;
         }
         
@@ -1544,11 +1544,11 @@
         const zipCode = document.getElementById('zipCode').value;
         
         if (!country) {
-          alert('Please select a country for accurate ZIP code search');
+          alert('Por favor selecciona un país para una búsqueda precisa de código postal');
           return;
         }
         if (!zipCode) {
-          alert('Please enter a ZIP / Postal code');
+          alert('Por favor ingresa un código postal');
           return;
         }
         
@@ -1562,7 +1562,7 @@
         const radiusMeters = document.getElementById('radiusMeters').value;
         
         if (!lat || !lng) {
-          alert('Please click on the map to select a location');
+          alert('Por favor haz clic en el mapa para seleccionar una ubicación');
           return;
         }
         
@@ -1580,11 +1580,11 @@
       results = [];
       updateStatus('running');
       startBtn.disabled = true;
-      startBtn.innerHTML = '<div class="spinner"></div> Scraping...';
+      startBtn.innerHTML = '<div class="spinner"></div> Extrayendo...';
       progressBar.style.display = 'block';
       progressText.style.display = 'block';
       progressFill.style.width = '0%';
-      progressText.textContent = 'Initializing...';
+      progressText.textContent = 'Inicializando...';
 
       try {
         const response = await fetch('/api/scrape', {
@@ -1652,15 +1652,15 @@
     function updateProgress(current, total, name) {
       const percent = Math.round((current / total) * 100);
       progressFill.style.width = `${percent}%`;
-      progressText.textContent = `Processing ${current}/${total}: ${name || '...'}`;
+      progressText.textContent = `Procesando ${current}/${total}: ${name || '...'}`;
     }
 
     function updateStatus(status) {
       statusBadge.className = `status-badge status-${status}`;
       const statusTexts = {
-        idle: 'Idle',
-        running: 'Running',
-        completed: 'Completed',
+        idle: 'Inactivo',
+        running: 'Ejecutando',
+        completed: 'Completado',
         error: 'Error',
       };
       statusBadge.textContent = statusTexts[status] || status;
@@ -1669,14 +1669,14 @@
     async function handleComplete(count) {
       updateStatus('completed');
       progressFill.style.width = '100%';
-      progressText.textContent = `Completed! Found ${count} businesses.`;
+      progressText.textContent = `¡Completado! Se encontraron ${count} negocios.`;
       
       startBtn.disabled = false;
       startBtn.innerHTML = `
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <polygon points="5 3 19 12 5 21 5 3"/>
         </svg>
-        Start Scraping
+        Iniciar Extracción
       `;
 
       await fetchResults();
@@ -1694,7 +1694,7 @@
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <polygon points="5 3 19 12 5 21 5 3"/>
         </svg>
-        Start Scraping
+        Iniciar Extracción
       `;
     }
 
@@ -1720,7 +1720,7 @@
           <tr>
             <td colspan="8">
               <div class="empty-state">
-                <p>No results found</p>
+                <p>No se encontraron resultados</p>
               </div>
             </td>
           </tr>
@@ -1750,17 +1750,17 @@
       resultsBody.innerHTML = results.map((item, index) => `
         <tr>
           <td>${index + 1}</td>
-          <td><strong>${escapeHtml(item.name || 'N/A')}</strong></td>
+          <td><strong>${escapeHtml(item.name || 'N/D')}</strong></td>
           <td>${escapeHtml(item.phone || '-')}</td>
           <td title="${escapeHtml(item.address?.full || '')}">${escapeHtml(truncate(item.address?.full || '-', 30))}</td>
           <td>
             ${item.website 
-              ? `<a href="${item.website}" target="_blank">Visit →</a>`
+              ? `<a href="${item.website}" target="_blank">Visitar →</a>`
               : '-'}
           </td>
           <td>
             <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.8rem;" onclick="showDetail(${index})">
-              View
+              Ver
             </button>
           </td>
         </tr>
@@ -1771,35 +1771,35 @@
       const item = results[index];
       if (!item) return;
 
-      document.getElementById('modalBusinessName').textContent = item.name || 'Business Details';
+      document.getElementById('modalBusinessName').textContent = item.name || 'Detalles del Negocio';
       
       const fields = [
-        { label: 'Business Name', value: item.name },
-        { label: 'Type', value: item.type },
-        { label: 'Phone', value: item.phone },
+        { label: 'Nombre del Negocio', value: item.name },
+        { label: 'Tipo', value: item.type },
+        { label: 'Teléfono', value: item.phone },
         { label: 'WhatsApp', value: item.whatsapp },
-        { label: 'Email', value: item.email },
-        { label: 'Website', value: item.website, isLink: true },
-        { label: 'Full Address', value: item.address?.full, fullWidth: true },
-        { label: 'Street', value: item.address?.street },
-        { label: 'City', value: item.address?.city },
-        { label: 'State', value: item.address?.state },
-        { label: 'ZIP Code', value: item.address?.zipCode },
-        { label: 'Country', value: item.address?.country },
-        { label: 'Latitude', value: item.coordinates?.latitude },
-        { label: 'Longitude', value: item.coordinates?.longitude },
-        { label: 'Rating', value: item.rating ? `${item.rating} ★` : null },
-        { label: 'Reviews Count', value: item.reviewsCount },
-        { label: 'Price Level', value: item.priceLevel },
-        { label: 'Plus Code', value: item.plusCode },
-        { label: 'Place ID', value: item.placeId },
-        { label: 'Description', value: item.description, fullWidth: true },
-        { label: 'Opening Hours', value: item.openingHours?.map(h => `${h.day}: ${h.hours}`).join('\n'), fullWidth: true },
-        { label: 'Amenities', value: item.amenities?.join(', '), fullWidth: true },
-        { label: 'Google Maps URL', value: item.googleMapsUrl, isLink: true, fullWidth: true },
-        { label: 'Image URL', value: item.imageUrl, isLink: true },
-        { label: 'Distance from Center', value: item.distanceFromCenter ? `${item.distanceFromCenter}m` : null },
-        { label: 'Scraped At', value: item.scrapedAt },
+        { label: 'Correo Electrónico', value: item.email },
+        { label: 'Sitio Web', value: item.website, isLink: true },
+        { label: 'Dirección Completa', value: item.address?.full, fullWidth: true },
+        { label: 'Calle', value: item.address?.street },
+        { label: 'Ciudad', value: item.address?.city },
+        { label: 'Estado/Provincia', value: item.address?.state },
+        { label: 'Código Postal', value: item.address?.zipCode },
+        { label: 'País', value: item.address?.country },
+        { label: 'Latitud', value: item.coordinates?.latitude },
+        { label: 'Longitud', value: item.coordinates?.longitude },
+        { label: 'Puntuación', value: item.rating ? `${item.rating} ★` : null },
+        { label: 'Cantidad de Reseñas', value: item.reviewsCount },
+        { label: 'Nivel de Precio', value: item.priceLevel },
+        { label: 'Código Plus', value: item.plusCode },
+        { label: 'ID del Lugar', value: item.placeId },
+        { label: 'Descripción', value: item.description, fullWidth: true },
+        { label: 'Horario de Apertura', value: item.openingHours?.map(h => `${h.day}: ${h.hours}`).join('\n'), fullWidth: true },
+        { label: 'Servicios', value: item.amenities?.join(', '), fullWidth: true },
+        { label: 'URL de Google Maps', value: item.googleMapsUrl, isLink: true, fullWidth: true },
+        { label: 'URL de Imagen', value: item.imageUrl, isLink: true },
+        { label: 'Distancia desde el Centro', value: item.distanceFromCenter ? `${item.distanceFromCenter}m` : null },
+        { label: 'Extraído el', value: item.scrapedAt },
       ];
 
       const content = fields

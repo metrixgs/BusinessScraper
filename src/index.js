@@ -13,46 +13,46 @@ function question(query) {
 async function main() {
   console.log('\n=========================================================');
   console.log('  Google Maps Business Scraper v1.0');
-  console.log('  Powered by Crawlee');
+  console.log('  Impulsado por Crawlee');
   console.log('=========================================================\n');
 
   try {
-    console.log('Select search type:');
-    console.log('1. Search by location (city, state, etc.)');
-    console.log('2. Search by ZIP code');
-    console.log('3. Search by coordinates with radius');
+    console.log('Seleccione el tipo de búsqueda:');
+    console.log('1. Búsqueda por ubicación (ciudad, estado, etc.)');
+    console.log('2. Búsqueda por código postal');
+    console.log('3. Búsqueda por coordenadas con radio');
     console.log('');
 
-    const searchType = await question('Enter your choice (1-3): ');
-    const query = await question('\nEnter business type/niche (e.g., "restaurants", "dentists"): ');
+    const searchType = await question('Ingrese su elección (1-3): ');
+    const query = await question('\nIngrese el tipo de negocio/niche (ej. "restaurantes", "dentistas"): ');
 
     let searchParams = { query };
 
     if (searchType === '1') {
-      const location = await question('Enter location (e.g., "New York, NY", "Miami, FL"): ');
+      const location = await question('Ingrese ubicación (ej. "Nueva York, NY", "Miami, FL"): ');
       searchParams.location = location;
     } else if (searchType === '2') {
-      const zipCode = await question('Enter ZIP code: ');
+      const zipCode = await question('Ingrese código postal: ');
       searchParams.zipCode = zipCode;
     } else if (searchType === '3') {
-      const latitude = parseFloat(await question('Enter latitude: '));
-      const longitude = parseFloat(await question('Enter longitude: '));
-      const radiusMeters = parseInt(await question('Enter radius in meters (e.g., 1000): '), 10);
+      const latitude = parseFloat(await question('Ingrese latitud: '));
+      const longitude = parseFloat(await question('Ingrese longitud: '));
+      const radiusMeters = parseInt(await question('Ingrese radio en metros (ej. 1000): '), 10);
       searchParams = { query, latitude, longitude, radiusMeters };
     }
 
-    const maxResultsInput = await question('\nMaximum results to scrape (default: 50): ');
+    const maxResultsInput = await question('\nMáximo de resultados a extraer (predeterminado: 50): ');
     const maxResults = parseInt(maxResultsInput, 10) || 50;
     searchParams.maxResults = maxResults;
 
-    const exportFormat = await question('\nExport format (json/csv/both) [default: both]: ') || 'both';
+    const exportFormat = await question('\nFormato de exportación (json/csv/ambos) [predeterminado: ambos]: ') || 'ambos';
 
     rl.close();
 
     const scraper = new GoogleMapsScraper();
 
     console.log('\n' + '='.repeat(60));
-    console.log('Starting scraper...');
+    console.log('Iniciando scraper...');
     console.log('='.repeat(60));
 
     let results;
@@ -66,10 +66,10 @@ async function main() {
 
     if (results && results.length > 0) {
       console.log('\n' + '='.repeat(60));
-      console.log('Exporting results...');
+      console.log('Exportando resultados...');
       console.log('='.repeat(60));
 
-      if (exportFormat === 'both') {
+      if (exportFormat === 'ambos') {
         await scraper.export('json');
         await scraper.export('csv');
       } else {
@@ -77,11 +77,11 @@ async function main() {
       }
 
       console.log('\n' + '='.repeat(60));
-      console.log(`Total businesses scraped: ${results.length}`);
+      console.log(`Total de negocios extraídos: ${results.length}`);
       
-      console.log('\nScraping completed successfully!');
+      console.log('\n¡Extracción completada exitosamente!');
     } else {
-      console.log('\nNo results found. Try adjusting your search parameters.');
+      console.log('\nNo se encontraron resultados. Intente ajustar sus parámetros de búsqueda.');
     }
 
   } catch (error) {

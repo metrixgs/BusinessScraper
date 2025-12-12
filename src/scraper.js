@@ -4,7 +4,7 @@ import { buildSearchUrl, calculateDistance, sleep, geocodeLocation, extractCoord
 import { extractBusinessUrls, extractBusinessData } from './extractor.js';
 import { exportToCSV, exportToJSON } from './export.js';
 
-// Speed optimization: Block unnecessary resources
+// Optimización de velocidad: Bloquear recursos innecesarios
 const BLOCKED_RESOURCE_TYPES = ['image', 'media', 'font', 'stylesheet'];
 const BLOCKED_URL_PATTERNS = [
   'google-analytics.com',
@@ -18,19 +18,19 @@ const BLOCKED_URL_PATTERNS = [
   '.mp4', '.webm', '.ogg'
 ];
 
-// Pre-navigation hook for speed optimization
+// Hook de pre-navegación para optimización de velocidad
 const speedOptimizationHook = async ({ page }) => {
   await page.route('**/*', (route) => {
     const request = route.request();
     const resourceType = request.resourceType();
     const url = request.url();
     
-    // Block images, fonts, media, stylesheets
+    // Bloquear imágenes, fuentes, medios, hojas de estilo
     if (BLOCKED_RESOURCE_TYPES.includes(resourceType)) {
       return route.abort();
     }
     
-    // Block tracking and unnecessary URLs
+    // Bloquear seguimiento y URLs innecesarias
     if (BLOCKED_URL_PATTERNS.some(pattern => url.includes(pattern))) {
       return route.abort();
     }
@@ -48,7 +48,7 @@ export class GoogleMapsScraper {
   }
 
   async search({ query, location, city, state, country, countryName, maxResults = 100 }) {
-    // Build location string from components if available
+    // Construir cadena de ubicación a partir de componentes si están disponibles
     if (city || state || countryName) {
       let locationParts = [];
       if (city) locationParts.push(city);
@@ -58,13 +58,13 @@ export class GoogleMapsScraper {
     }
     
     this.searchLocation = location;
-    console.log(`Searching: "${query}" in "${location}" | Max: ${maxResults}`);
+    console.log(`Buscando: "${query}" en "${location}" | Máx: ${maxResults}`);
 
     const coords = await geocodeLocation(location);
 
     let searchUrl;
     if (coords) {
-      console.log(`Location: ${coords.displayName} [${coords.latitude}, ${coords.longitude}]`);
+      console.log(`Ubicación: ${coords.displayName} [${coords.latitude}, ${coords.longitud}]`);
       searchUrl = buildSearchUrl({
         query,
         latitude: coords.latitude,
@@ -72,7 +72,7 @@ export class GoogleMapsScraper {
         radius: 10000
       });
     } else {
-      console.log(`Geocoding failed, using text search`);
+      console.log(`Geocodificación fallida, usando búsqueda de texto`);
       searchUrl = buildSearchUrl({ query, location });
     }
 
@@ -88,9 +88,9 @@ export class GoogleMapsScraper {
       fullLocation = `${fullLocation}, ${countryName}`;
     }
 
-    console.log(`Searching: "${query}" in ZIP "${zipCode}" | Max: ${maxResults}`);
-    if (countryName) console.log(`Country: ${countryName}`);
-    if (state) console.log(`State: ${state}`);
+    console.log(`Buscando: "${query}" en código postal "${zipCode}" | Máx: ${maxResults}`);
+    if (countryName) console.log(`País: ${countryName}`);
+    if (state) console.log(`Estado: ${state}`);
 
     const coords = await geocodeLocation(fullLocation);
     
@@ -99,28 +99,28 @@ export class GoogleMapsScraper {
     let stateName = state || '';
     
     if (coords) {
-      console.log(`Location: ${coords.displayName} [${coords.latitude}, ${coords.longitude}]`);
+      console.log(`Ubicación: ${coords.displayName} [${coords.latitude}, ${coords.longitud}]`);
       
-      // Extract city name from geocoded result for better filtering
+      // Extraer nombre de ciudad del resultado geocodificado para mejor filtrado
       const displayParts = coords.displayName.split(',').map(p => p.trim());
       if (displayParts.length >= 2) {
-        // Usually format is: "ZIP, City, County, State, Country"
+        // Formato usual: "Código postal, Ciudad, Condado, Estado, País"
         cityName = displayParts[1] || '';
       }
       if (cityName) {
-        console.log(`City detected: ${cityName}`);
+        console.log(`Ciudad detectada: ${cityName}`);
       }
       
-      // Use text-based search with ZIP code for more accurate results
-      const searchQuery = `${query} in ${zipCode}`;
+      // Usar búsqueda basada en texto con código postal para resultados más precisos
+      const searchQuery = `${query} en ${zipCode}`;
       searchUrl = buildSearchUrl({ query: searchQuery, location: '' });
     } else {
-      console.log(`Geocoding failed, using text search`);
-      const searchQuery = `${query} in ${zipCode}`;
+      console.log(`Geocodificación fallida, usando búsqueda de texto`);
+      const searchQuery = `${query} en ${zipCode}`;
       searchUrl = buildSearchUrl({ query: searchQuery, location: '' });
     }
 
-    // Use parallel search with smart ZIP/city filtering
+    // Usar búsqueda paralela con filtrado inteligente de código postal/ciudad
     return await this._parallelZipCodeSearch(searchUrl, zipCode, cityName, stateName, maxResults);
   }
 

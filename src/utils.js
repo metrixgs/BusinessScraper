@@ -3,12 +3,12 @@ export function buildSearchUrl({ query, location, latitude, longitude, radius })
   
   if (latitude && longitude) {
     const zoom = getZoomFromRadius(radius || 5000);
-    // Use coordinate-based search for precise location targeting
+    // Usar búsqueda basada en coordenadas para un objetivo de ubicación preciso
     const encodedQuery = encodeURIComponent(query);
     return `${baseUrl}${encodedQuery}/@${latitude},${longitude},${zoom}z`;
   } else if (location) {
-    // Use "query in location" format for better geo-targeting
-    // This tells Google Maps to search for the query WITHIN the specified location
+    // Usar formato "consulta en ubicación" para mejor geo-direccionamiento
+    // Esto le dice a Google Maps que busque la consulta DENTRO de la ubicación especificada
     const searchQuery = `${query} in ${location}`;
     return `${baseUrl}${encodeURIComponent(searchQuery)}`;
   } else {
@@ -16,7 +16,7 @@ export function buildSearchUrl({ query, location, latitude, longitude, radius })
   }
 }
 
-// Geocode a location name to coordinates using Nominatim (OpenStreetMap)
+// Geocodificar un nombre de ubicación a coordenadas usando Nominatim (OpenStreetMap)
 export async function geocodeLocation(locationName) {
   try {
     const encodedLocation = encodeURIComponent(locationName);
@@ -30,7 +30,7 @@ export async function geocodeLocation(locationName) {
     );
     
     if (!response.ok) {
-      console.log(`Geocoding failed for "${locationName}", using text search`);
+      console.log(`Geocodificación fallida para "${locationName}", usando búsqueda de texto`);
       return null;
     }
     
@@ -46,7 +46,7 @@ export async function geocodeLocation(locationName) {
     
     return null;
   } catch (error) {
-    console.log(`Geocoding error for "${locationName}": ${error.message}`);
+    console.log(`Error de geocodificación para "${locationName}": ${error.message}`);
     return null;
   }
 }

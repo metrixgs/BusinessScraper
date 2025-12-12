@@ -4,80 +4,80 @@
 [![Crawlee](https://img.shields.io/badge/Crawlee-3.7.3-blue.svg)](https://crawlee.dev/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-A professional Google Maps scraper built with Crawlee that extracts comprehensive business data with location-based search capabilities.
+Un scraper profesional de Google Maps construido con Crawlee que extrae datos completos de negocios con capacidades de búsqueda basadas en ubicación.
 
-> ⚡ **Fast** • 🎯 **Accurate** • 🛡️ **Reliable** • 📊 **Comprehensive**
-
----
-
-## 🎯 Features
-
-### 🔍 Search Methods
-- ✅ Search by location (city, address)
-- ✅ Search by ZIP code
-- ✅ Radius-based search (with distance filtering)
-
-### 📊 Data Extraction (25+ Fields)
-- Business name and type/category
-- Phone, WhatsApp, Email, Website
-- Full address with components (street, city, state, ZIP, country)
-- Geographic coordinates (latitude/longitude)
-- Opening hours (by day)
-- Rating and review count
-- Price level and description
-- Amenities and images
-- Plus code and Place ID
-
-### ⚡ Performance
-- 🚀 Fast execution using Crawlee
-- 👻 Headless browser automation
-- ♻️ Automatic retries on failures
-- 🎯 Efficient data extraction
-- ⏱️ Configurable timeouts
+> ⚡ **Rápido** • 🎯 **Preciso** • 🛡️ **Confiable** • 📊 **Completo**
 
 ---
 
-## 🚀 Quick Start
+## 🎯 Características
 
-### 1. Installation
+### 🔍 Métodos de Búsqueda
+- ✅ Búsqueda por ubicación (ciudad, dirección)
+- ✅ Búsqueda por código postal
+- ✅ Búsqueda por radio (con filtrado por distancia)
+
+### 📊 Extracción de Datos (25+ Campos)
+- Nombre del negocio y tipo/categoría
+- Teléfono, WhatsApp, Email, Sitio web
+- Dirección completa con componentes (calle, ciudad, estado, código postal, país)
+- Coordenadas geográficas (latitud/longitud)
+- Horario de apertura (por día)
+- Calificación y cantidad de reseñas
+- Nivel de precios y descripción
+- Servicios e imágenes
+- Código Plus y Place ID
+
+### ⚡ Rendimiento
+- 🚀 Ejecución rápida usando Crawlee
+- 👻 Automatización de navegador sin cabeza (headless)
+- ♻️ Reintentos automáticos en fallos
+- 🎯 Extracción eficiente de datos
+- ⏱️ Tiempos de espera configurables
+
+---
+
+## 🚀 Inicio Rápido
+
+### 1. Instalación
 ```bash
 npm install
 ```
 
-### 2. Start Server
+### 2. Iniciar Servidor
 ```bash
 npm start
 ```
 
-### 3. Open Web Interface
-Go to: **`http://localhost:3000`**
+### 3. Abrir Interfaz Web
+Ir a: **`http://localhost:3000`**
 
 ---
 
-## 🧪 Testing
+## 🧪 Pruebas
 
-### Search Methods Available
+### Métodos de Búsqueda Disponibles
 
-**1. Location Search**
-- Query: pizza, restaurants, hotels, dentists, coffee shops
-- Location: Chicago IL, New York NY, Los Angeles CA
+**1. Búsqueda por Ubicación**
+- Consulta: pizza, restaurantes, hoteles, dentistas, cafeterías
+- Ubicación: Chicago IL, Nueva York NY, Los Ángeles CA
 
-**2. ZIP Code Search**
-- Query: Any business type
-- ZIP Codes: 60614, 10001, 90210, 94102
+**2. Búsqueda por Código Postal**
+- Consulta: Cualquier tipo de negocio
+- Códigos Postales: 60614, 10001, 90210, 94102
 
-**3. Radius Search (Recommended)**
-- Query: Any business type
-- Top cities with coordinates ready to test
-- Radius: 1km, 5km, 10km options
+**3. Búsqueda por Radio (Recomendada)**
+- Consulta: Cualquier tipo de negocio
+- Ciudades principales con coordenadas listas para probar
+- Radio: opciones de 1km, 5km, 10km
 
-See [QUICKSTART.md](QUICKSTART.md) for detailed testing data and instructions.
+Ver [QUICKSTART.md](QUICKSTART.md) para datos de prueba detallados e instrucciones.
 
 ---
 
-## 📊 Sample Results
+## 📊 Resultados de Ejemplo
 
-Each business record includes:
+Cada registro de negocio incluye:
 
 ```json
 {
@@ -110,41 +110,40 @@ Each business record includes:
 
 ---
 
-## 💾 Export Options
+## 💾 Opciones de Exportación
 
-After scraping, download results as:
-- **JSON** - For API integration
-- **CSV** - For spreadsheet analysis
+Después del scraping, descarga los resultados como:
+- **JSON** - Para integración con API
+- **CSV** - Para análisis en hojas de cálculo
 
 ---
 
-## 📝 Documentation
+## 📝 Documentación
 
-| Document | Purpose |
+| Documento | Propósito |
 |----------|---------|
-| [QUICKSTART.md](QUICKSTART.md) | Web testing guide with sample data |
-| [START_HERE.md](START_HERE.md) | Complete overview |
+| [QUICKSTART.md](QUICKSTART.md) | Guía de pruebas web con datos de ejemplo |
+| [START_HERE.md](START_HERE.md) | Descripción completa |
 
 ---
 
-## ⚙️ Configuration
+## ⚙️ Configuración
 
-Environment variables (`.env`):
+Variables de entorno (`.env`):
 ```env
-HEADLESS=true          # Run without visible browser
-MAX_RESULTS=100        # Default max results
-TIMEOUT=60000          # Request timeout (ms)
+HEADLESS=true          # Ejecutar sin navegador visible
+MAX_RESULTS=100        # Máximo de resultados por defecto
+TIMEOUT=60000          # Tiempo de espera de solicitud (ms)
 ```
 
 ---
 
-## 📝 License
+## 📝 Licencia
 
 MIT
 
 ---
 
-## 🤝 Support
+## 🤝 Soporte
 
-See [QUICKSTART.md](QUICKSTART.md) for web testing guide and sample test data.
-
+Ver [QUICKSTART.md](QUICKSTART.md) para la guía de pruebas web y datos de prueba de ejemplo.
